@@ -6,6 +6,12 @@
         mc:Ignorable="d"
         Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" FontSize="20" MinWidth="200">
     <Grid>
-        <ListBox x:Name="listBoxCommands" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" SelectionChanged="ListBoxCommands_SelectionChanged"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" x:Name="labelRealtimeRecognition" Foreground="#FFFFFFFF" />
+        <ListBox Grid.Row="1" x:Name="listBoxCommands" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" SelectionChanged="ListBoxCommands_SelectionChanged" />
     </Grid>
 </Window>
