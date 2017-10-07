@@ -3,10 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Termix"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" FontSize="20" MinWidth="200">
     <Grid>
-        
+        <ListBox x:Name="listBoxCommands" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" SelectionChanged="ListBoxCommands_SelectionChanged"/>
     </Grid>
 </Window>
