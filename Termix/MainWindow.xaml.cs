@@ -9,8 +9,16 @@ namespace Termix
 {
     public partial class MainWindow : Window
     {
+        // Frequency in Hz
         private const int RECOGNIZER_SAMPLE_RATE = 16000;
-        private readonly TimeSpan RECOGNITION_TIMEOUT_INITIAL = TimeSpan.FromSeconds(5);
+
+        // Recognition has just started, nothing has been recognized yet
+        private readonly TimeSpan RECOGNITION_TIMEOUT_INITIAL = TimeSpan.FromSeconds(10);
+
+        // Part of the speech has already been recognized
+        private readonly TimeSpan RECOGNITION_TIMEOUT_PARTIAL = TimeSpan.FromSeconds(5);
+
+        // Final form of a speech segment has been recognized
         private readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(3);
 
         private Handler handler;
@@ -83,27 +91,21 @@ namespace Termix
                 {
                     foreach (StreamingRecognitionResult result in streamingCall.ResponseStream.Current.Results)
                     {
-                        string strRecognized = string.Empty;
-
                         foreach (SpeechRecognitionAlternative alternative in result.Alternatives)
                         {
-                            strRecognized += alternative.Transcript + " / ";
-                        }
-
-                        strRecognized += result.Alternatives.Count.ToString();
-
-                        // Final recognition result
-                        if (result.IsFinal)
-                        {
-                            // TODO: Implement a callback to return the final string
-                            dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
-                            Dispatcher?.Invoke(() => listBoxCommands.Items.Add(strRecognized));
-                        }
-                        // Recognition continues
-                        else
-                        {
-                            dtTimeout = DateTime.MaxValue;
-                            Dispatcher?.Invoke(() => labelRealtimeRecognition.Content = strRecognized);
+                            // Final recognition result
+                            if (result.IsFinal)
+                            {
+                                dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
+                                ProcessFinalRecognitionResult(alternative.Transcript);
+                                //Dispatcher?.Invoke(() => listBoxCommands.Items.Add(alternative.Transcript));
+                            }
+                            // Recognition continues
+                            else
+                            {
+                                dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_PARTIAL;
+                                Dispatcher?.Invoke(() => labelRealtimeRecognition.Content = alternative.Transcript);
+                            }
                         }
                     }
                 }
@@ -148,6 +150,11 @@ namespace Termix
             await printResponses;
 
             return 0;
+        }
+
+        private void ProcessFinalRecognitionResult(string result)
+        {
+            Dispatcher?.Invoke(() => listBoxCommands.Items.Add(result));
         }
     }
 }
