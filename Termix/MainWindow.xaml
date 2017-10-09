@@ -4,15 +4,18 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" FontSize="20" MinWidth="200">
+        Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" MinWidth="240">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="32" />
+            <RowDefinition Height="6" />
+            <RowDefinition MinHeight="40" />
+            <RowDefinition Height="6" />
             <RowDefinition />
+            <RowDefinition Height="6" />
         </Grid.RowDefinitions>
 
-        <Button Grid.Row="0" x:Name="buttonListen" Content="Listen" Click="ButtonListen_Click" Visibility="Visible" />
-        <Label Grid.Row="0" x:Name="labelRealtimeRecognition" Foreground="#FFFFFFFF" Visibility="Hidden" />
-        <ListBox Grid.Row="1" x:Name="listBoxCommands" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" SelectionChanged="ListBoxCommands_SelectionChanged" />
+        <Button Grid.Row="1" x:Name="buttonListen" Margin="10, 0" FontSize="24" Content="Listen" Click="ButtonListen_Click" Visibility="Visible" Background="#FFD0D0D0" Foreground="#FF404040" />
+        <Label Grid.Row="1" x:Name="labelRealtimeRecognition" Margin="10, 0" FontSize="20" Foreground="#FFFFFFFF" Visibility="Hidden" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
+        <ListBox Grid.Row="3" x:Name="listBoxCommands" Margin="10, 0" FontSize="20" Background="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="1" SelectionChanged="ListBoxCommands_SelectionChanged" />
     </Grid>
 </Window>

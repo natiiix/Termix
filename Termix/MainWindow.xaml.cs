@@ -31,8 +31,6 @@ namespace Termix
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             handler = new Handler();
-            //listBoxCommands.Items.Clear();
-            listBoxCommands.Items.Add("Done!");
         }
 
         private void ListBoxCommands_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -49,8 +47,7 @@ namespace Termix
             Dispatcher?.Invoke(() => UpdateListeningUI(true));
 
             // Listen and recognize
-            //await StreamingMicRecognizeAsync();
-            await Task.Delay(TimeSpan.FromSeconds(5));
+            await StreamingMicRecognizeAsync();
 
             Dispatcher?.Invoke(() => UpdateListeningUI(false));
         }
@@ -75,6 +72,8 @@ namespace Termix
                 buttonListen.Visibility = Visibility.Visible;
                 // Hide the real-time recognition label
                 labelRealtimeRecognition.Visibility = Visibility.Hidden;
+                // Clear the real-time-recognition label
+                labelRealtimeRecognition.ClearValue(ContentProperty);
             }
         }
 
@@ -84,7 +83,7 @@ namespace Termix
 
             if (NAudio.Wave.WaveIn.DeviceCount < 1)
             {
-                Console.WriteLine("No microphone!");
+                MessageBox.Show("No microphone!");
                 return -1;
             }
 
@@ -100,9 +99,9 @@ namespace Termix
                     {
                         Encoding = RecognitionConfig.Types.AudioEncoding.Linear16,
                         SampleRateHertz = RECOGNIZER_SAMPLE_RATE,
-                        LanguageCode = "en",
+                        LanguageCode = "en-US",
                     },
-                    InterimResults = true,
+                    InterimResults = true
                 }
             });
 
@@ -157,7 +156,6 @@ namespace Termix
                             // Stop recording
                             waveIn.StopRecording();
                             writeMore = false;
-                            Dispatcher?.Invoke(() => listBoxCommands.Items.Add("--------- Timed Out --------"));
                             return;
                         }
 
@@ -168,8 +166,8 @@ namespace Termix
                     }
                 };
 
+            // Start recording
             waveIn.StartRecording();
-            Console.WriteLine("Speak now.");
 
             // Wait for the recording to stop
             while (writeMore)
