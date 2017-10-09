@@ -28,10 +28,8 @@ namespace Termix
             InitializeComponent();
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            await StreamingMicRecognizeAsync();
-
             handler = new Handler();
             //listBoxCommands.Items.Clear();
             listBoxCommands.Items.Add("Done!");
@@ -43,6 +41,40 @@ namespace Termix
             {
                 handler.Handle(listBoxCommands.SelectedItem as string);
                 listBoxCommands.SelectedIndex = -1;
+            }
+        }
+
+        private async void ButtonListen_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher?.Invoke(() => UpdateListeningUI(true));
+
+            // Listen and recognize
+            //await StreamingMicRecognizeAsync();
+            await Task.Delay(TimeSpan.FromSeconds(5));
+
+            Dispatcher?.Invoke(() => UpdateListeningUI(false));
+        }
+
+        private void UpdateListeningUI(bool listening)
+        {
+            // The button can only be used when not listening
+            buttonListen.IsEnabled = !listening;
+
+            // If listening
+            if (listening)
+            {
+                // Hide the "Listen button"
+                buttonListen.Visibility = Visibility.Hidden;
+                // Display the real-time recognition label
+                labelRealtimeRecognition.Visibility = Visibility.Visible;
+            }
+            // If not listening
+            else
+            {
+                // Display the "Listen" button
+                buttonListen.Visibility = Visibility.Visible;
+                // Hide the real-time recognition label
+                labelRealtimeRecognition.Visibility = Visibility.Hidden;
             }
         }
 

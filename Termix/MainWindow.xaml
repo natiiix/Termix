@@ -11,7 +11,8 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" x:Name="labelRealtimeRecognition" Foreground="#FFFFFFFF" />
+        <Button Grid.Row="0" x:Name="buttonListen" Content="Listen" Click="ButtonListen_Click" Visibility="Visible" />
+        <Label Grid.Row="0" x:Name="labelRealtimeRecognition" Foreground="#FFFFFFFF" Visibility="Hidden" />
         <ListBox Grid.Row="1" x:Name="listBoxCommands" Margin="10" Background="{x:Null}" BorderBrush="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" SelectionChanged="ListBoxCommands_SelectionChanged" />
     </Grid>
 </Window>
