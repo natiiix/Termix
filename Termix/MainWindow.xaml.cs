@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Google.Cloud.Speech.V1;
+using System.Diagnostics;
 
 namespace Termix
 {
@@ -21,7 +22,7 @@ namespace Termix
         // Final form of a speech segment has been recognized
         private readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(3);
 
-        private Handler handler;
+        private VoiceCommandList cmdList;
 
         public MainWindow()
         {
@@ -30,16 +31,24 @@ namespace Termix
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            handler = new Handler();
-        }
+            cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
-        private void ListBoxCommands_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (listBoxCommands.SelectedItem != null)
-            {
-                handler.Handle(listBoxCommands.SelectedItem as string);
-                listBoxCommands.SelectedIndex = -1;
-            }
+            cmdList.AddCommand(new VoiceCommand(
+                x => x.StartsWithCaseInsensitive("search "),
+                x => x.Substring(7),
+                x => Process.Start("https://www.google.com/search?q=" + x.Replace(' ', '+'))
+                ));
+
+            cmdList.AddCommand(new VoiceCommand(
+                x => x.EqualsCaseInsensitive("open weather forecast"),
+                x => string.Empty,
+                x => Process.Start("https://www.google.com/search?q=weather+forecast")
+                ));
+
+            listBoxCommandList.Items.Add("Available");
+            listBoxCommandList.Items.Add("Commands");
+            listBoxCommandList.Items.Add("Go");
+            listBoxCommandList.Items.Add("Here");
         }
 
         private async void ButtonListen_Click(object sender, RoutedEventArgs e)
@@ -128,7 +137,7 @@ namespace Termix
                             if (result.IsFinal)
                             {
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
-                                ProcessFinalRecognitionResult(alternative.Transcript);
+                                cmdList.HandleInput(alternative.Transcript);
                                 //Dispatcher?.Invoke(() => listBoxCommands.Items.Add(alternative.Transcript));
                             }
                             // Recognition continues
@@ -180,11 +189,6 @@ namespace Termix
             await printResponses;
 
             return 0;
-        }
-
-        private void ProcessFinalRecognitionResult(string result)
-        {
-            Dispatcher?.Invoke(() => listBoxCommands.Items.Add(result));
         }
     }
 }

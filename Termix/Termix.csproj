@@ -121,6 +121,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="VoiceCommand.cs" />
+    <Compile Include="VoiceCommandList.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -130,7 +132,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Command.cs" />
-    <Compile Include="Handler.cs" />
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
