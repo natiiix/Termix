@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" MinWidth="240">
+        Title="Termix" Background="#FF404048" ResizeMode="CanMinimize" SizeToContent="WidthAndHeight" Loaded="Window_Loaded" FontFamily="Arial" MinWidth="240" Topmost="True">
 
     <Grid>
         <Grid.RowDefinitions>

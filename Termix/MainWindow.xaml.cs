@@ -5,23 +5,15 @@ using System.Windows;
 using System.Windows.Controls;
 using Google.Cloud.Speech.V1;
 using System.Diagnostics;
+using System.Speech.Recognition;
+using System.Speech.Synthesis;
 
 namespace Termix
 {
     public partial class MainWindow : Window
     {
-        // Frequency in Hz
-        private const int RECOGNIZER_SAMPLE_RATE = 16000;
-
-        // Recognition has just started, nothing has been recognized yet
-        private readonly TimeSpan RECOGNITION_TIMEOUT_INITIAL = TimeSpan.FromSeconds(10);
-
-        // Part of the speech has already been recognized
-        private readonly TimeSpan RECOGNITION_TIMEOUT_PARTIAL = TimeSpan.FromSeconds(5);
-
-        // Final form of a speech segment has been recognized
-        private readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(3);
-
+        private const string DEFAULT_ASSISTANT_NAME = "Assistant";
+        private SpeechRecognitionEngine offlineRecognizer;
         private VoiceCommandList cmdList;
 
         public MainWindow()
@@ -31,7 +23,31 @@ namespace Termix
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            offlineRecognizer = new SpeechRecognitionEngine();
+            offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
+            offlineRecognizer.SetInputToDefaultAudioDevice();
+            SetAssistantName(DEFAULT_ASSISTANT_NAME);
+            ActivateOfflineRecognizer();
+
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
+
+            cmdList.AddCommand(new VoiceCommand(
+                x => x.StartsWithCaseInsensitive("change name to "),
+                x => x.Substring(15),
+                x => SetAssistantName(x)
+                ));
+
+            cmdList.AddCommand(new VoiceCommand(
+                x => x.EqualsCaseInsensitive("close yourself"),
+                x => string.Empty,
+                x => Dispatcher?.Invoke(Close)
+                ));
+
+            cmdList.AddCommand(new VoiceCommand(
+                x => x.StartsWithCaseInsensitive("type "),
+                x => x.Substring(5),
+                System.Windows.Forms.SendKeys.SendWait
+                ));
 
             cmdList.AddCommand(new VoiceCommand(
                 x => x.StartsWithCaseInsensitive("search "),
@@ -51,14 +67,29 @@ namespace Termix
             listBoxCommandList.Items.Add("Here");
         }
 
-        private async void ButtonListen_Click(object sender, RoutedEventArgs e)
+        private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
+            Listen();
+        }
+
+        private void ButtonListen_Click(object sender, RoutedEventArgs e)
+        {
+            Listen();
+        }
+
+        private async void Listen()
+        {
+            offlineRecognizer.RecognizeAsyncCancel();
             Dispatcher?.Invoke(() => UpdateListeningUI(true));
 
             // Listen and recognize
-            await StreamingMicRecognizeAsync();
+            await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
+                x => cmdList.HandleInput(x),
+                x => Dispatcher?.Invoke(() => labelRealtimeRecognition.Content = x)
+                );
 
             Dispatcher?.Invoke(() => UpdateListeningUI(false));
+            ActivateOfflineRecognizer();
         }
 
         private void UpdateListeningUI(bool listening)
@@ -86,109 +117,16 @@ namespace Termix
             }
         }
 
-        private async Task<object> StreamingMicRecognizeAsync()
+        private void SetAssistantName(string name)
         {
-            DateTime dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_INITIAL;
+            offlineRecognizer.RecognizeAsyncCancel();
+            offlineRecognizer.UnloadAllGrammars();
+            offlineRecognizer.LoadGrammar(new Grammar(new Choices(name).ToGrammarBuilder()));
+        }
 
-            if (NAudio.Wave.WaveIn.DeviceCount < 1)
-            {
-                MessageBox.Show("No microphone!");
-                return -1;
-            }
-
-            SpeechClient speech = SpeechClient.Create();
-            SpeechClient.StreamingRecognizeStream streamingCall = speech.StreamingRecognize();
-
-            // Write the initial request with the config
-            await streamingCall.WriteAsync(new StreamingRecognizeRequest()
-            {
-                StreamingConfig = new StreamingRecognitionConfig()
-                {
-                    Config = new RecognitionConfig()
-                    {
-                        Encoding = RecognitionConfig.Types.AudioEncoding.Linear16,
-                        SampleRateHertz = RECOGNIZER_SAMPLE_RATE,
-                        LanguageCode = "en-US",
-                    },
-                    InterimResults = true
-                }
-            });
-
-            // Read from the microphone and stream to API
-            NAudio.Wave.WaveInEvent waveIn = new NAudio.Wave.WaveInEvent
-            {
-                DeviceNumber = 0,
-                WaveFormat = new NAudio.Wave.WaveFormat(RECOGNIZER_SAMPLE_RATE, 1)
-            };
-
-            object writeLock = new object();
-            bool writeMore = true;
-
-            // Print responses as they arrive
-            Task printResponses = Task.Run(async () =>
-            {
-                while (await streamingCall.ResponseStream.MoveNext(default(System.Threading.CancellationToken)))
-                {
-                    foreach (StreamingRecognitionResult result in streamingCall.ResponseStream.Current.Results)
-                    {
-                        foreach (SpeechRecognitionAlternative alternative in result.Alternatives)
-                        {
-                            // Final recognition result
-                            if (result.IsFinal)
-                            {
-                                dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
-                                cmdList.HandleInput(alternative.Transcript);
-                                //Dispatcher?.Invoke(() => listBoxCommands.Items.Add(alternative.Transcript));
-                            }
-                            // Recognition continues
-                            else
-                            {
-                                dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_PARTIAL;
-                                Dispatcher?.Invoke(() => labelRealtimeRecognition.Content = alternative.Transcript);
-                            }
-                        }
-                    }
-                }
-            });
-
-            // Audio recorded
-            waveIn.DataAvailable += (object sender, NAudio.Wave.WaveInEventArgs args) =>
-                {
-                    lock (writeLock)
-                    {
-                        if (!writeMore)
-                            return;
-
-                        // Timed out
-                        if (DateTime.Now >= dtTimeout)
-                        {
-                            // Stop recording
-                            waveIn.StopRecording();
-                            writeMore = false;
-                            return;
-                        }
-
-                        streamingCall.WriteAsync(new StreamingRecognizeRequest()
-                        {
-                            AudioContent = Google.Protobuf.ByteString.CopyFrom(args.Buffer, 0, args.BytesRecorded)
-                        }).Wait();
-                    }
-                };
-
-            // Start recording
-            waveIn.StartRecording();
-
-            // Wait for the recording to stop
-            while (writeMore)
-            {
-                await Task.Delay(TimeSpan.FromSeconds(1));
-            }
-
-            // Shut down
-            await streamingCall.WriteCompleteAsync();
-            await printResponses;
-
-            return 0;
+        private void ActivateOfflineRecognizer()
+        {
+            offlineRecognizer.RecognizeAsync(RecognizeMode.Multiple);
         }
     }
 }
