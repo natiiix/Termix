@@ -123,6 +123,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ExpressionComparator.cs" />
     <Compile Include="GoogleSpeechRecognizer.cs" />
     <Compile Include="VoiceCommand.cs" />
     <Compile Include="VoiceCommandList.cs" />

@@ -75,14 +75,14 @@ namespace Termix
                             // Final recognition result
                             if (result.IsFinal)
                             {
-                                FinalRecognitionAction(alternative.Transcript);
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
+                                FinalRecognitionAction(alternative.Transcript);
                             }
                             // Recognition continues
                             else
                             {
-                                PartialRecognitionAction(alternative.Transcript);
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_PARTIAL;
+                                PartialRecognitionAction(alternative.Transcript);
                             }
                         }
                     }

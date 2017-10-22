@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using Google.Cloud.Speech.V1;
+﻿using System.Windows;
 using System.Diagnostics;
 using System.Speech.Recognition;
-using System.Speech.Synthesis;
 
 namespace Termix
 {
@@ -23,6 +17,8 @@ namespace Termix
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            //bool asdf = ExpressionComparator.Compare("change your activation to John", "change [your] { name | activation [ command ] } to *", out string asdsffa);
+
             offlineRecognizer = new SpeechRecognitionEngine();
             offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
             offlineRecognizer.SetInputToDefaultAudioDevice();
@@ -32,32 +28,27 @@ namespace Termix
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
             cmdList.AddCommand(new VoiceCommand(
-                x => x.StartsWithCaseInsensitive("change name to "),
-                x => x.Substring(15),
-                x => SetAssistantName(x)
+                "change [your] { name | activation [ command ] } to *",
+                x => Dispatcher?.Invoke(() => SetAssistantName(x))
                 ));
 
             cmdList.AddCommand(new VoiceCommand(
-                x => x.EqualsCaseInsensitive("close yourself"),
-                x => string.Empty,
+                "close yourself",
                 x => Dispatcher?.Invoke(Close)
                 ));
 
             cmdList.AddCommand(new VoiceCommand(
-                x => x.StartsWithCaseInsensitive("type "),
-                x => x.Substring(5),
+                "{ type | write } *",
                 System.Windows.Forms.SendKeys.SendWait
                 ));
 
             cmdList.AddCommand(new VoiceCommand(
-                x => x.StartsWithCaseInsensitive("search "),
-                x => x.Substring(7),
+                "search [for] *",
                 x => Process.Start("https://www.google.com/search?q=" + x.Replace(' ', '+'))
                 ));
 
             cmdList.AddCommand(new VoiceCommand(
-                x => x.EqualsCaseInsensitive("open weather forecast"),
-                x => string.Empty,
+                "open weather forecast",
                 x => Process.Start("https://www.google.com/search?q=weather+forecast")
                 ));
 
@@ -81,6 +72,8 @@ namespace Termix
         {
             offlineRecognizer.RecognizeAsyncCancel();
             Dispatcher?.Invoke(() => UpdateListeningUI(true));
+
+            labelRealtimeRecognition.Content = "Listening...";
 
             // Listen and recognize
             await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
@@ -122,6 +115,8 @@ namespace Termix
             offlineRecognizer.RecognizeAsyncCancel();
             offlineRecognizer.UnloadAllGrammars();
             offlineRecognizer.LoadGrammar(new Grammar(new Choices(name).ToGrammarBuilder()));
+
+            labelName.Content = "Name: " + name.CapitalizeFirstLetter();
         }
 
         private void ActivateOfflineRecognizer()

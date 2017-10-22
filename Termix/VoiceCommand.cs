@@ -5,24 +5,23 @@ namespace Termix
     public class VoiceCommand
     {
         public delegate bool MatchTestFunction(string input);
+
         public delegate string ExtractParameterCallback(string input);
 
-        private readonly MatchTestFunction MatchTest;
-        private readonly ExtractParameterCallback ExtractParameter;
+        private readonly string MatchExpression;
         private readonly Action<string> CommandAction;
 
-        public VoiceCommand(MatchTestFunction inputMatchesCommand, ExtractParameterCallback extractCommandParameter, Action<string> commandAction)
+        public VoiceCommand(string matchExpression, Action<string> commandAction)
         {
-            MatchTest = inputMatchesCommand;
-            ExtractParameter = extractCommandParameter;
+            MatchExpression = matchExpression;
             CommandAction = commandAction;
         }
 
         public bool DoActionIfMatch(string input)
         {
-            if (MatchTest(input))
+            if (ExpressionComparator.Compare(input, MatchExpression, out string value))
             {
-                CommandAction(ExtractParameter(input));
+                CommandAction(value);
                 return true;
             }
 
