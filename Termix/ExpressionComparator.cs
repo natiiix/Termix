@@ -239,6 +239,13 @@ namespace Termix
             else if (expr.Any(x => starts.Contains(x) || ends.Contains(x)))
             {
                 int rem = RemainderAfterExpression(str, expr, out value);
+
+                if (rem < 0)
+                {
+                    matchLength = 0;
+                    return false;
+                }
+
                 matchLength = str.Length - rem;
                 return matchLength > 0;
             }

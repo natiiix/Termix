@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Diagnostics;
 using System.Speech.Recognition;
 
@@ -17,8 +18,6 @@ namespace Termix
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //bool asdf = ExpressionComparator.Compare("change your activation to John", "change [your] { name | activation [ command ] } to *", out string asdsffa);
-
             offlineRecognizer = new SpeechRecognitionEngine();
             offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
             offlineRecognizer.SetInputToDefaultAudioDevice();
@@ -27,35 +26,26 @@ namespace Termix
 
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
-            cmdList.AddCommand(new VoiceCommand(
-                "change [your] { name | activation [ command ] } to *",
-                x => Dispatcher?.Invoke(() => SetAssistantName(x))
-                ));
+            RegisterCommand("{ change [your] { name | activation [command] } | rename yourself } to *",
+                x => Dispatcher?.Invoke(() => SetAssistantName(x)));
 
-            cmdList.AddCommand(new VoiceCommand(
-                "close yourself",
-                x => Dispatcher?.Invoke(Close)
-                ));
+            RegisterCommand("close yourself",
+                x => Dispatcher?.Invoke(Close));
 
-            cmdList.AddCommand(new VoiceCommand(
-                "{ type | write } *",
-                System.Windows.Forms.SendKeys.SendWait
-                ));
+            RegisterCommand("{ type | write } *",
+                System.Windows.Forms.SendKeys.SendWait);
 
-            cmdList.AddCommand(new VoiceCommand(
-                "search [for] *",
-                x => Process.Start("https://www.google.com/search?q=" + x.Replace(' ', '+'))
-                ));
+            RegisterCommand("search [for] *",
+                x => Process.Start("https://www.google.com/search?q=" + x.Replace(' ', '+')));
 
-            cmdList.AddCommand(new VoiceCommand(
-                "open weather forecast",
-                x => Process.Start("https://www.google.com/search?q=weather+forecast")
-                ));
+            RegisterCommand("open weather forecast",
+                x => Process.Start("https://www.google.com/search?q=weather+forecast"));
 
-            listBoxCommandList.Items.Add("Available");
-            listBoxCommandList.Items.Add("Commands");
-            listBoxCommandList.Items.Add("Go");
-            listBoxCommandList.Items.Add("Here");
+            foreach (string dir in new string[] { "documents", "music", "pictures", "videos", "downloads", "desktop" })
+            {
+                RegisterCommand(ExpressionGenerator.UserDirectory(dir),
+                    x => WindowsCommands.OpenDirectoryInExplorer("%userprofile%\\" + dir));
+            }
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -66,6 +56,12 @@ namespace Termix
         private void ButtonListen_Click(object sender, RoutedEventArgs e)
         {
             Listen();
+        }
+
+        private void RegisterCommand(string matchExpression, Action<string> commandAction)
+        {
+            cmdList.AddCommand(new VoiceCommand(matchExpression, commandAction));
+            listBoxCommandList.Items.Add(matchExpression);
         }
 
         private async void Listen()

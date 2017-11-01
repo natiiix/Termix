@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using Google.Cloud.Speech.V1;
-using System.Diagnostics;
-using System.Speech.Recognition;
-using System.Speech.Synthesis;
 
 namespace Termix
 {
