@@ -125,13 +125,13 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="VoiceAssistant_Actions.cs" />
-    <Compile Include="ExpressionComparator.cs" />
+    <Compile Include="ExpressionHandler.cs" />
     <Compile Include="ExpressionGenerator.cs" />
     <Compile Include="GoogleSpeechRecognizer.cs" />
     <Compile Include="VoiceAssistant.cs" />
     <Compile Include="VoiceCommand.cs" />
     <Compile Include="VoiceCommandList.cs" />
-    <Compile Include="WindowsCommands.cs" />
+    <Compile Include="WindowsTools.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

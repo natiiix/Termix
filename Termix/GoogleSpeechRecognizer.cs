@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Google.Cloud.Speech.V1;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
-using Google.Cloud.Speech.V1;
 
 namespace Termix
 {

@@ -19,7 +19,7 @@ namespace Termix
 
         public bool DoActionIfMatch(string input)
         {
-            if (ExpressionComparator.Compare(input, MatchExpression, out string value))
+            if (ExpressionHandler.Compare(input, MatchExpression, out string value))
             {
                 CommandAction(value);
                 return true;

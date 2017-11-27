@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Termix
 {
-    public static class ExpressionComparator
+    public static class ExpressionHandler
     {
         // Definitions of start and end characters
 
@@ -19,20 +19,54 @@ namespace Termix
 
         public static bool Compare(string str, string expression, out string value)
         {
-            int valueIdx = NormalizeString(expression).IndexOf(VALUE_INDICATOR);
+            int valueIdx = expression.IndexOf(VALUE_INDICATOR);
 
             if (valueIdx >= 0 && valueIdx < expression.Length - 1)
             {
                 throw new ArgumentException("Invalid expression! Value indicator must be at the very end of an expression!");
             }
 
-            return RemainderAfterExpression(str, expression, out value) == 0;
+            return RemainderAfterExpression(str.ToLower(), expression.ToLower(), out value) == 0;
+        }
+
+        public static string GetFirstOption(string expression)
+        {
+            // Create list for the output parts
+            List<string> firstOptionParts = new List<string>();
+
+            // Split the input expression into parts
+            List<string> parts = SplitExpressions(expression.TrimSpaces());
+
+            // Iterate through the parts
+            foreach (string part in parts)
+            {
+                // Ignore optional parts
+                if (part.First() == starts[PAIR_OPTIONAL] && part.Last() == ends[PAIR_OPTIONAL])
+                {
+                    continue;
+                }
+                // Part with alternatives
+                else if (part.First() == starts[PAIR_ALTERNATIVES] && part.Last() == ends[PAIR_ALTERNATIVES])
+                {
+                    // Get the first alternative
+                    string firstAlternative = SplitAlternatives(part.Substring(1, part.Length - 2)).First();
+
+                    // Recursively process the first alternative
+                    firstOptionParts.Add(GetFirstOption(firstAlternative));
+                }
+                else
+                {
+                    firstOptionParts.Add(part);
+                }
+            }
+
+            return string.Join(" ", firstOptionParts);
         }
 
         private static int RemainderAfterExpression(string str, string expr, out string value)
         {
             string remainder = str;
-            List<string> exprParts = SplitExpressions(NormalizeString(expr));
+            List<string> exprParts = SplitExpressions(expr.TrimSpaces());
 
             value = string.Empty;
 
@@ -50,8 +84,6 @@ namespace Termix
 
             return remainder.Length;
         }
-
-        private static string NormalizeString(string str) => str.Trim(' ').ToLower();
 
         private static int FindEndOfPair(string str, int startIdx = 0)
         {
@@ -135,7 +167,7 @@ namespace Termix
                         throw new Exception("Unable to find the end of this pair!");
                     }
 
-                    parts.Add(str.Substring(partStart, partEnd + 1 - partStart));
+                    parts.Add(str.Substring(partStart, partEnd + 1 - partStart).TrimSpaces());
                     partStart = partEnd + 1;
                     i = partEnd;
                 }
@@ -143,7 +175,7 @@ namespace Termix
 
             if (partStart < str.Length)
             {
-                parts.Add(str.Substring(partStart));
+                parts.Add(str.Substring(partStart).TrimSpaces());
             }
 
             return parts;
@@ -182,7 +214,7 @@ namespace Termix
 
             if (partStart < str.Length)
             {
-                parts.Add(str.Substring(partStart));
+                parts.Add(str.Substring(partStart).TrimSpaces());
             }
 
             return parts;

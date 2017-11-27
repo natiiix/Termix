@@ -4,8 +4,16 @@
     {
         private void ActionRename(string newName)
         {
-            Speak("Renaming myself to " + newName);
-            invokeDispatcher(() => SetAssistantName(newName));
+            // User is trying to set the assistant's name to an empty string
+            if (newName == string.Empty)
+            {
+                Speak("The assistant must have a name!");
+            }
+            else
+            {
+                Speak("Chaning my name to " + newName);
+                invokeDispatcher(() => SetAssistantName(newName));
+            }
         }
 
         private void ActionClose()
@@ -17,25 +25,25 @@
         private void ActionType(string textToType)
         {
             Speak("Typing " + textToType);
-            WindowsCommands.TypeText(textToType);
+            WindowsTools.TypeText(textToType);
         }
 
         private void ActionSearch(string searchText)
         {
             Speak("Searching for " + searchText);
-            WindowsCommands.OpenURLInWebBrowser("https://www.google.com/search?q=" + searchText.Replace(' ', '+'));
+            WindowsTools.OpenURLInWebBrowser("https://www.google.com/search?q=" + searchText.Replace(' ', '+'));
         }
 
         private void ActionOpenWeatherForecast()
         {
             Speak("Opening weather forecast");
-            WindowsCommands.OpenURLInWebBrowser("https://www.google.com/search?q=weather+forecast");
+            WindowsTools.OpenURLInWebBrowser("https://www.google.com/search?q=weather+forecast");
         }
 
         private void ActionOpenUserDirectory(string dirName)
         {
             Speak("Opening your " + dirName + " directory");
-            WindowsCommands.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
+            WindowsTools.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
         }
     }
 }

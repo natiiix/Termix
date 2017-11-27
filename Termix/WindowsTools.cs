@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace Termix
 {
-    public static class WindowsCommands
+    public static class WindowsTools
     {
         public static void OpenDirectoryInExplorer(string dirPath)
         {
