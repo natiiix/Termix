@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Speech.Recognition;
-using System.Speech.Synthesis;
 using System.Windows;
 
 namespace Termix
@@ -11,7 +10,6 @@ namespace Termix
 
         private string assistantName;
         private SpeechRecognitionEngine offlineRecognizer;
-        private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
 
         // Invoke dispatcher
@@ -66,8 +64,6 @@ namespace Termix
             SetAssistantName(DEFAULT_ASSISTANT_NAME);
             ActivateOfflineRecognizer();
 
-            synthesizer = new SpeechSynthesizer();
-
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
             RegisterCommand("{ change [your] { name | activation [command] } | rename yourself } to *", ActionRename);
@@ -82,7 +78,13 @@ namespace Termix
             }
         }
 
-        private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e) => Listen();
+        private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
+        {
+            if (e.Result.Confidence > 0.9f)
+            {
+                Listen();
+            }
+        }
 
         private void RegisterCommand(string matchExpression, Action<string> commandAction)
         {
@@ -99,7 +101,7 @@ namespace Termix
 
             // Let the user know the assistant is listening
             setRecognitionLabelText("Listening...");
-            Speak("How can I help you?");
+            Speaker.Speak("How can I help you?");
 
             // Listen and recognize
             await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
@@ -125,7 +127,5 @@ namespace Termix
         }
 
         private void ActivateOfflineRecognizer() => offlineRecognizer.RecognizeAsync(RecognizeMode.Multiple);
-
-        private void Speak(string text) => synthesizer.SpeakAsync(text);
     }
 }
