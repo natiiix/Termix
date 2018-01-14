@@ -11,7 +11,7 @@
             }
             else
             {
-                Speaker.Speak("Chaning my name to " + newName);
+                Speaker.Speak("Changing my name to " + newName);
                 invokeDispatcher(() => SetAssistantName(newName));
             }
         }
