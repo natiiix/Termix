@@ -80,7 +80,7 @@ namespace Termix
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.9f)
+            if (e.Result.Confidence > 0.93f)
             {
                 Listen();
             }
