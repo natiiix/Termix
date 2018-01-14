@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Speech.Recognition;
+using System.Speech.Synthesis;
 using System.Windows;
 
 namespace Termix
@@ -10,6 +11,7 @@ namespace Termix
 
         private string assistantName;
         private SpeechRecognitionEngine offlineRecognizer;
+        private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
 
         // Invoke dispatcher
@@ -42,6 +44,11 @@ namespace Termix
 
         private UpdateListeningUICallback updateListeningUI;
 
+        // Append log
+        public delegate void AppendLogCallback(string text);
+
+        private AppendLogCallback appendLog;
+
         // Constructor
         public VoiceAssistant(
             InvokeDispatcherCallback invokeDispatcherCallback,
@@ -49,7 +56,8 @@ namespace Termix
             AddCommandToListCallback addCommandToListCallback,
             SetRecognitionLabelTextCallback setRecognitionLabelTextCallback,
             SetNameLabelTextCallback setNameLabelTextCallback,
-            UpdateListeningUICallback updateListeningUICallback)
+            UpdateListeningUICallback updateListeningUICallback,
+            AppendLogCallback appendLogCallback)
         {
             invokeDispatcher = invokeDispatcherCallback;
             closeMainWindow = closeMainWindowCallback;
@@ -57,12 +65,15 @@ namespace Termix
             setRecognitionLabelText = setRecognitionLabelTextCallback;
             setNameLabelText = setNameLabelTextCallback;
             updateListeningUI = updateListeningUICallback;
+            appendLog = appendLogCallback;
 
             offlineRecognizer = new SpeechRecognitionEngine();
             offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
             offlineRecognizer.SetInputToDefaultAudioDevice();
             SetAssistantName(DEFAULT_ASSISTANT_NAME);
             ActivateOfflineRecognizer();
+
+            synthesizer = new SpeechSynthesizer();
 
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
@@ -101,11 +112,11 @@ namespace Termix
 
             // Let the user know the assistant is listening
             setRecognitionLabelText("Listening...");
-            Speaker.Speak("How can I help you?");
+            Speak("How can I help you?");
 
             // Listen and recognize
             await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
-                cmdList.HandleInput,
+                HandleCommand,
                 x => setRecognitionLabelText(x)
                 );
 
@@ -119,6 +130,7 @@ namespace Termix
         {
             assistantName = name;
 
+            // Stop offline speech recognizer and restart it with the new name
             offlineRecognizer.RecognizeAsyncCancel();
             offlineRecognizer.UnloadAllGrammars();
             offlineRecognizer.LoadGrammar(new Grammar(new Choices(name).ToGrammarBuilder()));
@@ -127,5 +139,17 @@ namespace Termix
         }
 
         private void ActivateOfflineRecognizer() => offlineRecognizer.RecognizeAsync(RecognizeMode.Multiple);
+
+        private void Speak(string text)
+        {
+            appendLog("[Assistant] " + text);
+            synthesizer.SpeakAsync(text);
+        }
+
+        private void HandleCommand(string cmd)
+        {
+            appendLog("[User] " + cmd);
+            cmdList.HandleInput(cmd);
+        }
     }
 }

@@ -124,7 +124,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Speaker.cs" />
     <Compile Include="VoiceAssistant_Actions.cs" />
     <Compile Include="ExpressionHandler.cs" />
     <Compile Include="ExpressionGenerator.cs" />

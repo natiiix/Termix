@@ -20,7 +20,8 @@ namespace Termix
                 x => InvokeDispatcher(() => listBoxCommandList.Items.Add(ExpressionHandler.GetFirstOption(x))),
                 x => InvokeDispatcher(() => labelRealtimeRecognition.Content = x),
                 x => InvokeDispatcher(() => labelName.Content = x),
-                x => InvokeDispatcher(() => UpdateListeningUI(x))
+                x => InvokeDispatcher(() => UpdateListeningUI(x)),
+                x => InvokeDispatcher(() => AppendLog(x))
                 );
         }
 
@@ -54,6 +55,16 @@ namespace Termix
         private void InvokeDispatcher(Action action)
         {
             Dispatcher?.Invoke(action);
+        }
+
+        private void AppendLog(string text)
+        {
+            if (textBlockLog.Text.Length > 0)
+            {
+                textBlockLog.Text += Environment.NewLine;
+            }
+
+            textBlockLog.Text += text;
         }
     }
 }
