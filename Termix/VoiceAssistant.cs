@@ -75,7 +75,7 @@ namespace Termix
 
             synthesizer = new SpeechSynthesizer();
 
-            cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
+            cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             RegisterCommand("{ change [your] { name | activation [command] } | rename [yourself] } to *", ActionRename);
             RegisterCommand("close { yourself | the assistant }", x => ActionClose());
@@ -91,7 +91,7 @@ namespace Termix
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.925f)
+            if (e.Result.Confidence > 0.92f)
             {
                 Listen();
             }
