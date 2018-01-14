@@ -77,7 +77,7 @@ namespace Termix
 
             cmdList = new VoiceCommandList(x => MessageBox.Show("Unrecognized command: " + x));
 
-            RegisterCommand("{ change [your] { name | activation [command] } | rename yourself } to *", ActionRename);
+            RegisterCommand("{ change [your] { name | activation [command] } | rename [yourself] } to *", ActionRename);
             RegisterCommand("close { yourself | the assistant }", x => ActionClose());
             RegisterCommand("{ type | write } *", ActionType);
             RegisterCommand("search [for] *", ActionSearch);
@@ -91,7 +91,7 @@ namespace Termix
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.93f)
+            if (e.Result.Confidence > 0.925f)
             {
                 Listen();
             }
@@ -135,6 +135,7 @@ namespace Termix
             offlineRecognizer.UnloadAllGrammars();
             offlineRecognizer.LoadGrammar(new Grammar(new Choices(name).ToGrammarBuilder()));
 
+            // Display the current name of the assistant
             setNameLabelText("Name: " + name.CapitalizeFirstLetter());
         }
 

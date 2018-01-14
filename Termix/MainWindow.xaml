@@ -29,6 +29,6 @@
         <Label Grid.Row="1" Grid.Column="1" x:Name="labelRealtimeRecognition" FontSize="20" Foreground="#FFFFFFFF" Visibility="Hidden" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Label Grid.Row="3" Grid.Column="1" x:Name="labelName" FontSize="20" Foreground="#FFFFFFFF" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <ListBox Grid.Row="5" Grid.Column="1" x:Name="listBoxCommandList" FontSize="20" Background="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" />
-        <TextBlock Grid.Row="7" Grid.Column="1" x:Name="textBlockLog" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Foreground="#FFC0C0C0" />
+        <TextBox Grid.Row="7" Grid.Column="1" x:Name="textBoxLog" IsReadOnly="True" Background="{x:Null}" Foreground="#FFD0D0D0" TextWrapping="Wrap" TextChanged="TextBoxLog_TextChanged" />
     </Grid>
 </Window>

@@ -27,6 +27,8 @@ namespace Termix
 
         private void ButtonListen_Click(object sender, RoutedEventArgs e) => assistant.Listen();
 
+        private void TextBoxLog_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e) => textBoxLog.ScrollToEnd();
+
         private void UpdateListeningUI(bool listening)
         {
             // The button can only be used when not listening
@@ -52,19 +54,16 @@ namespace Termix
             }
         }
 
-        private void InvokeDispatcher(Action action)
-        {
-            Dispatcher?.Invoke(action);
-        }
+        private void InvokeDispatcher(Action action) => Dispatcher?.Invoke(action);
 
         private void AppendLog(string text)
         {
-            if (textBlockLog.Text.Length > 0)
+            if (textBoxLog.Text.Length > 0)
             {
-                textBlockLog.Text += Environment.NewLine;
+                textBoxLog.Text += Environment.NewLine;
             }
 
-            textBlockLog.Text += text;
+            textBoxLog.Text += text;
         }
     }
 }
