@@ -20,7 +20,7 @@ namespace Termix
         // Currently without timeout => the recognition will not continue once the final result was recognized
         private static readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(0);
 
-        public static async Task<object> StreamingMicRecognizeAsync(Action<string> FinalRecognitionAction, Action<string> PartialRecognitionAction)
+        public static async Task<object> StreamingMicRecognizeAsync(Action<string> finalRecognitionAction, Action<string> partialRecognitionAction)
         {
             DateTime dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_INITIAL;
 
@@ -72,7 +72,7 @@ namespace Termix
                             {
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                                Task.Factory.StartNew(() => FinalRecognitionAction(alternative.Transcript));
+                                Task.Factory.StartNew(() => finalRecognitionAction(alternative.Transcript));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                             }
                             // Recognition continues
@@ -80,7 +80,7 @@ namespace Termix
                             {
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_PARTIAL;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                                Task.Factory.StartNew(() => PartialRecognitionAction(alternative.Transcript));
+                                Task.Factory.StartNew(() => partialRecognitionAction(alternative.Transcript));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                             }
                         }
