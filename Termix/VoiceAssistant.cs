@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Drawing;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
-using System.Windows;
+using System.Windows.Forms;
 
 namespace Termix
 {
@@ -151,6 +152,38 @@ namespace Termix
         {
             appendLog("[User] " + cmd);
             cmdList.HandleInput(cmd);
+        }
+
+        private void TypeText(string text)
+        {
+            //SendKeys.SendWait(text);
+
+            invokeDispatcher(() =>
+            {
+                // Get the current clipboard data
+                string oldText = Clipboard.GetText();
+                Image oldImage = Clipboard.GetImage();
+
+                // Set the clipboard to the text to type
+                Clipboard.SetText(text);
+
+                // Press Ctrl+V to paste the text in the clipboard
+                //Windows.Keyboard.Down(Key.LeftCtrl);
+                //Windows.Keyboard.Press(Key.V);
+                //Windows.Keyboard.Up(Key.LeftCtrl);
+                SendKeys.SendWait("^{v}");
+
+                // Set the clipboard data back to the original data
+                if (oldText != null && oldText != string.Empty)
+                {
+                    Clipboard.SetText(oldText);
+                }
+
+                if (oldImage != null)
+                {
+                    Clipboard.SetImage(oldImage);
+                }
+            });
         }
     }
 }

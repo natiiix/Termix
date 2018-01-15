@@ -25,25 +25,25 @@
         private void ActionType(string textToType)
         {
             Speak("Typing: " + textToType);
-            WindowsTools.TypeText(textToType);
+            TypeText(textToType);
         }
 
         private void ActionSearch(string searchText)
         {
             Speak("Searching for " + searchText);
-            WindowsTools.OpenURLInWebBrowser("https://www.google.com/search?q=" + searchText.Replace(' ', '+'));
+            Windows.OpenURLInWebBrowser("https://www.google.com/search?q=" + searchText.Replace(' ', '+'));
         }
 
         private void ActionOpenWeatherForecast()
         {
             Speak("Opening weather forecast");
-            WindowsTools.OpenURLInWebBrowser("https://www.google.com/search?q=weather+forecast");
+            Windows.OpenURLInWebBrowser("https://www.google.com/search?q=weather+forecast");
         }
 
         private void ActionOpenUserDirectory(string dirName)
         {
             Speak("Opening your " + dirName + " directory");
-            WindowsTools.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
+            Windows.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
         }
     }
 }
