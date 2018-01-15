@@ -1,4 +1,6 @@
-﻿namespace Termix
+﻿using System.Windows.Forms;
+
+namespace Termix
 {
     public partial class VoiceAssistant
     {
@@ -44,6 +46,18 @@
         {
             Speak("Opening your " + dirName + " directory");
             Windows.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
+        }
+
+        private void ActionPressEnter()
+        {
+            Speak("Pressing enter");
+            SendKeys.SendWait("{ENTER}");
+        }
+
+        private void ActionPressSpace()
+        {
+            Speak("Pressing spacebar");
+            SendKeys.SendWait(" ");
         }
     }
 }

@@ -79,10 +79,12 @@ namespace Termix
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             RegisterCommand("{ change [your] { name | activation [command] } | rename [yourself] } to *", ActionRename);
-            RegisterCommand("close { yourself | the assistant }", x => ActionClose());
+            RegisterCommand("{ close { yourself | the assistant } | shut [{ yourself | the assistant }] down }", x => ActionClose());
             RegisterCommand("{ type | write } *", ActionType);
             RegisterCommand("search [for] *", ActionSearch);
             RegisterCommand("open weather forecast", x => ActionOpenWeatherForecast());
+            RegisterCommand("press [the] enter [key]", x => ActionPressEnter());
+            RegisterCommand("press [the] { space | space bar } [key]", x => ActionPressSpace());
 
             foreach (string dir in new string[] { "documents", "music", "pictures", "videos", "downloads", "desktop" })
             {
@@ -156,6 +158,11 @@ namespace Termix
 
         private void TypeText(string text)
         {
+            if (text == null || text == string.Empty)
+            {
+                return;
+            }
+
             //SendKeys.SendWait(text);
 
             invokeDispatcher(() =>
