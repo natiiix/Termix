@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
@@ -79,6 +80,15 @@ namespace Termix
             RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
             RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop) (?:directory|folder|library)?", ActionOpenUserDirectory);
+
+            RegisterCommand("move from ([A-H][1-8]) to ([A-H][1-8])", x =>
+            {
+                Speak($"Making a chess move from {x[0]} to {x[1]}");
+                System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
+            });
+
+            RegisterCommand("open (?:a )?new tab", _ => SendKeysWait("^{t}"), AssistantMode.Browser);
+            RegisterCommand("close (?:(?:the|this) )?tab", _ => SendKeysWait("^{w}"), AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
@@ -181,10 +191,22 @@ namespace Termix
             });
         }
 
+        private void SendKeysWait(string keys) => invokeDispatcher(() => SendKeys.SendWait(keys));
+
         private AssistantMode GetCurrentAssistantMode()
         {
-            // TODO
-            return AssistantMode.Default;
+            Process proc = Windows.GetForegroundProcess();
+            string procName = proc.ProcessName;
+            string windowTitle = proc.MainWindowTitle;
+
+            switch (procName)
+            {
+                case "chrome":
+                    return AssistantMode.Browser;
+
+                default:
+                    return AssistantMode.Default;
+            }
         }
     }
 }

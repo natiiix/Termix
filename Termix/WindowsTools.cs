@@ -11,9 +11,15 @@ namespace Termix
         [DllImport("user32.dll", SetLastError = true)]
         public static extern IntPtr GetForegroundWindow();
 
-        public static string GetForegroundWindowProcessName()
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out uint ProcessId);
+
+        public static Process GetForegroundProcess()
         {
-            return Process.GetProcesses().Single(p => p.Id != 0 && p.MainWindowHandle == GetForegroundWindow()).ProcessName;
+            IntPtr hwnd = GetForegroundWindow();
+            GetWindowThreadProcessId(hwnd, out uint pid);
+            Process p = Process.GetProcessById((int)pid);
+            return p;
         }
 
         public static void OpenDirectoryInExplorer(string dirPath)
