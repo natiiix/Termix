@@ -25,11 +25,6 @@ namespace Termix
 
         private CloseMainWindowCallback closeMainWindow;
 
-        // Add command to list
-        public delegate void AddCommandToListCallback(string strCommand);
-
-        private AddCommandToListCallback addCommandToList;
-
         // Set recognition label text
         public delegate void SetRecognitionLabelTextCallback(string strText);
 
@@ -54,7 +49,6 @@ namespace Termix
         public VoiceAssistant(
             InvokeDispatcherCallback invokeDispatcherCallback,
             CloseMainWindowCallback closeMainWindowCallback,
-            AddCommandToListCallback addCommandToListCallback,
             SetRecognitionLabelTextCallback setRecognitionLabelTextCallback,
             SetNameLabelTextCallback setNameLabelTextCallback,
             UpdateListeningUICallback updateListeningUICallback,
@@ -62,7 +56,6 @@ namespace Termix
         {
             invokeDispatcher = invokeDispatcherCallback;
             closeMainWindow = closeMainWindowCallback;
-            addCommandToList = addCommandToListCallback;
             setRecognitionLabelText = setRecognitionLabelTextCallback;
             setNameLabelText = setNameLabelTextCallback;
             updateListeningUI = updateListeningUICallback;
@@ -78,32 +71,27 @@ namespace Termix
 
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
-            RegisterCommand("{ change [your] { name | activation [command] } | rename [yourself] } to *", ActionRename);
-            RegisterCommand("{ close { yourself | the assistant } | shut [{ yourself | the assistant }] down }", x => ActionClose());
-            RegisterCommand("{ type | write } *", ActionType);
-            RegisterCommand("search [for] *", ActionSearch);
-            RegisterCommand("open weather forecast", x => ActionOpenWeatherForecast());
-            RegisterCommand("press [the] enter [key]", x => ActionPressEnter());
-            RegisterCommand("press [the] { space | space bar } [key]", x => ActionPressSpace());
-
-            foreach (string dir in new string[] { "documents", "music", "pictures", "videos", "downloads", "desktop" })
-            {
-                RegisterCommand(ExpressionGenerator.UserDirectory(dir), x => ActionOpenUserDirectory(dir));
-            }
+            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
+            RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionClose);
+            RegisterCommand("(?:type|write) (.+)", ActionType);
+            RegisterCommand("search (?:for )?(.+)", ActionSearch);
+            RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
+            RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
+            RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop) (?:directory|folder|library)?", ActionOpenUserDirectory);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.92f)
+            if (e.Result.Confidence > 0.85f)
             {
                 Listen();
             }
         }
 
-        private void RegisterCommand(string matchExpression, Action<string> commandAction)
+        private void RegisterCommand(string matchExpression, Action<string[]> commandAction)
         {
             cmdList.AddCommand(new VoiceCommand(matchExpression, commandAction));
-            addCommandToList(matchExpression);
         }
 
         public async void Listen()

@@ -13,8 +13,6 @@
             <RowDefinition Height="6" />
             <RowDefinition MinHeight="40" />
             <RowDefinition Height="6" />
-            <RowDefinition MaxHeight="400" />
-            <RowDefinition Height="6" />
             <RowDefinition MaxHeight="100" />
             <RowDefinition Height="6" />
         </Grid.RowDefinitions>
@@ -28,7 +26,6 @@
         <Button Grid.Row="1" Grid.Column="1" x:Name="buttonListen" FontSize="24" Content="Listen" Click="ButtonListen_Click" Visibility="Visible" Background="#FFD0D0D0" Foreground="#FF404040" />
         <Label Grid.Row="1" Grid.Column="1" x:Name="labelRealtimeRecognition" FontSize="20" Foreground="#FFFFFFFF" Visibility="Hidden" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
         <Label Grid.Row="3" Grid.Column="1" x:Name="labelName" FontSize="20" Foreground="#FFFFFFFF" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" />
-        <ListBox Grid.Row="5" Grid.Column="1" x:Name="listBoxCommandList" FontSize="20" Background="{x:Null}" Foreground="#FFE0E0E0" HorizontalContentAlignment="Center" BorderThickness="0" />
-        <TextBox Grid.Row="7" Grid.Column="1" x:Name="textBoxLog" IsReadOnly="True" Background="{x:Null}" Foreground="#FFD0D0D0" TextWrapping="Wrap" TextChanged="TextBoxLog_TextChanged" />
+        <TextBox Grid.Row="5" Grid.Column="1" x:Name="textBoxLog" IsReadOnly="True" Background="{x:Null}" Foreground="#FFD0D0D0" TextWrapping="Wrap" Padding="4" TextChanged="TextBoxLog_TextChanged" />
     </Grid>
 </Window>

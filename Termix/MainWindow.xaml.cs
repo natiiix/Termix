@@ -17,7 +17,6 @@ namespace Termix
             assistant = new VoiceAssistant(
                 InvokeDispatcher,
                 () => InvokeDispatcher(Close),
-                x => InvokeDispatcher(() => listBoxCommandList.Items.Add(ExpressionHandler.GetFirstOption(x))),
                 x => InvokeDispatcher(() => labelRealtimeRecognition.Content = x),
                 x => InvokeDispatcher(() => labelName.Content = x),
                 x => InvokeDispatcher(() => UpdateListeningUI(x)),

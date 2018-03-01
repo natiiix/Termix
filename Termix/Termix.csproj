@@ -126,8 +126,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="VoiceAssistant_Actions.cs" />
-    <Compile Include="ExpressionHandler.cs" />
-    <Compile Include="ExpressionGenerator.cs" />
     <Compile Include="GoogleSpeechRecognizer.cs" />
     <Compile Include="VoiceAssistant.cs" />
     <Compile Include="VoiceCommand.cs" />
