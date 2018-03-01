@@ -5,18 +5,20 @@ namespace Termix
 {
     public class VoiceCommand
     {
-        private readonly Regex RegEx;
+        public readonly AssistantMode Mode;
+        private readonly Regex RegExPattern;
         private readonly Action<string[]> CommandAction;
 
-        public VoiceCommand(string regex, Action<string[]> action)
+        public VoiceCommand(string regex, Action<string[]> action, AssistantMode mode = AssistantMode.All)
         {
-            RegEx = new Regex($"^{regex}$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            Mode = mode;
+            RegExPattern = new Regex($"^{regex}$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
             CommandAction = action;
         }
 
         public bool DoActionIfMatch(string input)
         {
-            Match match = RegEx.Match(input);
+            Match match = RegExPattern.Match(input);
 
             if (match.Success)
             {

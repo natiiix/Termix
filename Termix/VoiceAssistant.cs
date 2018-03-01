@@ -89,9 +89,9 @@ namespace Termix
             }
         }
 
-        private void RegisterCommand(string matchExpression, Action<string[]> commandAction)
+        private void RegisterCommand(string regex, Action<string[]> action, AssistantMode mode = AssistantMode.All)
         {
-            cmdList.AddCommand(new VoiceCommand(matchExpression, commandAction));
+            cmdList.AddCommand(new VoiceCommand(regex, action, mode));
         }
 
         public async void Listen()
@@ -141,7 +141,7 @@ namespace Termix
         private void HandleCommand(string cmd)
         {
             appendLog("[User] " + cmd);
-            cmdList.HandleInput(cmd);
+            cmdList.HandleInput(cmd, GetCurrentAssistantMode());
         }
 
         private void TypeText(string text)
@@ -179,6 +179,12 @@ namespace Termix
                     Clipboard.SetImage(oldImage);
                 }
             });
+        }
+
+        private AssistantMode GetCurrentAssistantMode()
+        {
+            // TODO
+            return AssistantMode.Default;
         }
     }
 }

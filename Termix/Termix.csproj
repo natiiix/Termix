@@ -125,6 +125,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AssistantMode.cs" />
     <Compile Include="VoiceAssistant_Actions.cs" />
     <Compile Include="GoogleSpeechRecognizer.cs" />
     <Compile Include="VoiceAssistant.cs" />

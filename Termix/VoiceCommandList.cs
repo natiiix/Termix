@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Termix
 {
@@ -19,9 +20,9 @@ namespace Termix
             Commands.Add(cmd);
         }
 
-        public void HandleInput(string input)
+        public void HandleInput(string input, AssistantMode mode)
         {
-            foreach (VoiceCommand cmd in Commands)
+            foreach (VoiceCommand cmd in Commands.Where(x => x.Mode.HasFlag(mode)))
             {
                 if (cmd.DoActionIfMatch(input))
                 {
