@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-using System.Linq;
 
 namespace Termix
 {

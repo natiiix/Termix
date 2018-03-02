@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Windows;
 using System.Globalization;
+using System.Windows;
 
 namespace Termix
 {
