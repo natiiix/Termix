@@ -9,9 +9,6 @@ namespace Termix
 {
     public partial class VoiceAssistant
     {
-        private const string DEFAULT_ASSISTANT_NAME = "Assistant";
-
-        private string assistantName;
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
@@ -65,7 +62,7 @@ namespace Termix
             offlineRecognizer = new SpeechRecognitionEngine();
             offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
             offlineRecognizer.SetInputToDefaultAudioDevice();
-            SetAssistantName(DEFAULT_ASSISTANT_NAME);
+            LoadAssistantName();
             ActivateOfflineRecognizer();
 
             synthesizer = new SpeechSynthesizer();
@@ -73,12 +70,13 @@ namespace Termix
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             RegisterCommand("do nothing|don't do anything|stop listening", _ => Speak("ok"));
-
-            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
             RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionClose);
+            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
+            RegisterCommand(@"increase (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionIncreaseActivationSensitivity);
+            RegisterCommand(@"decrease (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionDecreaseActivationSensitivity);
+            RegisterCommand("reset assistant settings", ActionResetSettings);
+
             RegisterCommand("(?:type|write) (.+)", ActionType);
-            RegisterCommand("search (?:for )?(.+)", ActionSearch);
-            RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
             RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
             RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop) (?:directory|folder|library)?", ActionOpenUserDirectory);
@@ -89,13 +87,18 @@ namespace Termix
                 System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
             });
 
+            RegisterCommand("search (?:for )?(.+)", ActionSearch);
+            RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
+            RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
+
             RegisterCommand("open (?:a )?new tab", _ => SendKeysWait("^{t}"), AssistantMode.Browser);
             RegisterCommand("close (?:(?:the|this) )?tab", _ => SendKeysWait("^{w}"), AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.85f)
+            if (e.Result.Confidence >= 1d - Properties.Settings.Default.ActivationSensitivity)
             {
                 Listen();
             }
@@ -129,9 +132,9 @@ namespace Termix
             ActivateOfflineRecognizer();
         }
 
-        private void SetAssistantName(string name)
+        private void LoadAssistantName()
         {
-            assistantName = name;
+            string name = Properties.Settings.Default.Name;
 
             // Stop offline speech recognizer and restart it with the new name
             offlineRecognizer.RecognizeAsyncCancel();

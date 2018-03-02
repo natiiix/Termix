@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Globalization;
 
 namespace Termix
 {
@@ -9,6 +10,8 @@ namespace Termix
 
         public MainWindow()
         {
+            CultureInfo.CurrentUICulture = CultureInfo.CurrentCulture = CultureInfo.DefaultThreadCurrentUICulture = CultureInfo.DefaultThreadCurrentCulture = new CultureInfo(0x0409);
+
             InitializeComponent();
         }
 
