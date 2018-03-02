@@ -2,11 +2,26 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
+using System.Linq;
 
 namespace Termix
 {
     public static class Windows
     {
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, out uint ProcessId);
+
+        public static Process GetForegroundProcess()
+        {
+            IntPtr hwnd = GetForegroundWindow();
+            GetWindowThreadProcessId(hwnd, out uint pid);
+            Process p = Process.GetProcessById((int)pid);
+            return p;
+        }
+
         public static void OpenDirectoryInExplorer(string dirPath)
         {
             Process.Start("explorer", Environment.ExpandEnvironmentVariables(dirPath));

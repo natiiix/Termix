@@ -1,31 +1,39 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Termix
 {
     public class VoiceCommand
     {
-        public delegate bool MatchTestFunction(string input);
+        public readonly AssistantMode Mode;
+        private readonly Regex RegExPattern;
+        private readonly Action<string[]> CommandAction;
 
-        public delegate string ExtractParameterCallback(string input);
-
-        private readonly string MatchExpression;
-        private readonly Action<string> CommandAction;
-
-        public VoiceCommand(string matchExpression, Action<string> commandAction)
+        public VoiceCommand(string regex, Action<string[]> action, AssistantMode mode = AssistantMode.All)
         {
-            MatchExpression = matchExpression;
-            CommandAction = commandAction;
+            Mode = mode;
+            RegExPattern = new Regex($"^{regex}$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            CommandAction = action;
         }
 
         public bool DoActionIfMatch(string input)
         {
-            if (ExpressionHandler.Compare(input, MatchExpression, out string value))
+            Match match = RegExPattern.Match(input);
+
+            if (match.Success)
             {
-                CommandAction(value);
-                return true;
+                string[] args = new string[match.Groups.Count - 1];
+
+                for (int i = 1; i < match.Groups.Count; i++)
+                {
+                    Group group = match.Groups[i];
+                    args[i - 1] = group.Value;
+                }
+
+                CommandAction(args);
             }
 
-            return false;
+            return match.Success;
         }
     }
 }

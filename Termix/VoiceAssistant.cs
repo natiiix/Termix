@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
@@ -8,9 +9,6 @@ namespace Termix
 {
     public partial class VoiceAssistant
     {
-        private const string DEFAULT_ASSISTANT_NAME = "Assistant";
-
-        private string assistantName;
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
@@ -24,11 +22,6 @@ namespace Termix
         public delegate void CloseMainWindowCallback();
 
         private CloseMainWindowCallback closeMainWindow;
-
-        // Add command to list
-        public delegate void AddCommandToListCallback(string strCommand);
-
-        private AddCommandToListCallback addCommandToList;
 
         // Set recognition label text
         public delegate void SetRecognitionLabelTextCallback(string strText);
@@ -54,7 +47,6 @@ namespace Termix
         public VoiceAssistant(
             InvokeDispatcherCallback invokeDispatcherCallback,
             CloseMainWindowCallback closeMainWindowCallback,
-            AddCommandToListCallback addCommandToListCallback,
             SetRecognitionLabelTextCallback setRecognitionLabelTextCallback,
             SetNameLabelTextCallback setNameLabelTextCallback,
             UpdateListeningUICallback updateListeningUICallback,
@@ -62,7 +54,6 @@ namespace Termix
         {
             invokeDispatcher = invokeDispatcherCallback;
             closeMainWindow = closeMainWindowCallback;
-            addCommandToList = addCommandToListCallback;
             setRecognitionLabelText = setRecognitionLabelTextCallback;
             setNameLabelText = setNameLabelTextCallback;
             updateListeningUI = updateListeningUICallback;
@@ -71,39 +62,51 @@ namespace Termix
             offlineRecognizer = new SpeechRecognitionEngine();
             offlineRecognizer.SpeechRecognized += OfflineRecognizer_SpeechRecognized;
             offlineRecognizer.SetInputToDefaultAudioDevice();
-            SetAssistantName(DEFAULT_ASSISTANT_NAME);
+            LoadAssistantName();
             ActivateOfflineRecognizer();
 
             synthesizer = new SpeechSynthesizer();
 
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
-            RegisterCommand("{ change [your] { name | activation [command] } | rename [yourself] } to *", ActionRename);
-            RegisterCommand("{ close { yourself | the assistant } | shut [{ yourself | the assistant }] down }", x => ActionClose());
-            RegisterCommand("{ type | write } *", ActionType);
-            RegisterCommand("search [for] *", ActionSearch);
-            RegisterCommand("open weather forecast", x => ActionOpenWeatherForecast());
-            RegisterCommand("press [the] enter [key]", x => ActionPressEnter());
-            RegisterCommand("press [the] { space | space bar } [key]", x => ActionPressSpace());
+            RegisterCommand("do nothing|don't do anything|stop listening", _ => Speak("ok"));
+            RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionClose);
+            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
+            RegisterCommand(@"increase (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionIncreaseActivationSensitivity);
+            RegisterCommand(@"decrease (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionDecreaseActivationSensitivity);
+            RegisterCommand("reset assistant settings", ActionResetSettings);
 
-            foreach (string dir in new string[] { "documents", "music", "pictures", "videos", "downloads", "desktop" })
+            RegisterCommand("(?:type|write) (.+)", ActionType);
+            RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
+            RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
+            RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop) (?:directory|folder|library)?", ActionOpenUserDirectory);
+
+            RegisterCommand("move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
-                RegisterCommand(ExpressionGenerator.UserDirectory(dir), x => ActionOpenUserDirectory(dir));
-            }
+                Speak($"Making a chess move from {x[0]} to {x[1]}");
+                System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
+            });
+
+            RegisterCommand("search (?:for )?(.+)", ActionSearch);
+            RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
+            RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
+
+            RegisterCommand("open (?:a )?new tab", _ => SendKeysWait("^{t}"), AssistantMode.Browser);
+            RegisterCommand("close (?:(?:the|this) )?tab", _ => SendKeysWait("^{w}"), AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
         {
-            if (e.Result.Confidence > 0.92f)
+            if (e.Result.Confidence >= 1d - Properties.Settings.Default.ActivationSensitivity)
             {
                 Listen();
             }
         }
 
-        private void RegisterCommand(string matchExpression, Action<string> commandAction)
+        private void RegisterCommand(string regex, Action<string[]> action, AssistantMode mode = AssistantMode.All)
         {
-            cmdList.AddCommand(new VoiceCommand(matchExpression, commandAction));
-            addCommandToList(matchExpression);
+            cmdList.AddCommand(new VoiceCommand(regex, action, mode));
         }
 
         public async void Listen()
@@ -129,9 +132,9 @@ namespace Termix
             ActivateOfflineRecognizer();
         }
 
-        private void SetAssistantName(string name)
+        private void LoadAssistantName()
         {
-            assistantName = name;
+            string name = Properties.Settings.Default.Name;
 
             // Stop offline speech recognizer and restart it with the new name
             offlineRecognizer.RecognizeAsyncCancel();
@@ -153,7 +156,7 @@ namespace Termix
         private void HandleCommand(string cmd)
         {
             appendLog("[User] " + cmd);
-            cmdList.HandleInput(cmd);
+            cmdList.HandleInput(cmd, GetCurrentAssistantMode());
         }
 
         private void TypeText(string text)
@@ -191,6 +194,24 @@ namespace Termix
                     Clipboard.SetImage(oldImage);
                 }
             });
+        }
+
+        private void SendKeysWait(string keys) => invokeDispatcher(() => SendKeys.SendWait(keys));
+
+        private AssistantMode GetCurrentAssistantMode()
+        {
+            Process proc = Windows.GetForegroundProcess();
+            string procName = proc.ProcessName;
+            string windowTitle = proc.MainWindowTitle;
+
+            switch (procName)
+            {
+                case "chrome":
+                    return AssistantMode.Browser;
+
+                default:
+                    return AssistantMode.Default;
+            }
         }
     }
 }
