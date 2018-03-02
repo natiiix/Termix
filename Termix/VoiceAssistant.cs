@@ -72,6 +72,8 @@ namespace Termix
 
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
+            RegisterCommand("do nothing|don't do anything|stop listening", _ => Speak("ok"));
+
             RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
             RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionClose);
             RegisterCommand("(?:type|write) (.+)", ActionType);
