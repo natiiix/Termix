@@ -114,8 +114,27 @@ namespace Termix
 
         private void ActionSearch(string[] args)
         {
-            Speak("Searching for " + args[0]);
-            HelperFunctions.GoogleSearch(args[0]);
+            string site = string.IsNullOrEmpty(args[1]) ? "Google" : args[1];
+
+            Speak($"Searching for {args[0]} on {site}");
+
+            switch (site)
+            {
+                case "Google":
+                    HelperFunctions.GoogleSearch(args[0]);
+                    break;
+
+                case "YouTube":
+                    HelperFunctions.YouTubeSearch(args[0]);
+                    break;
+
+                case "Wikipedia":
+                    HelperFunctions.WikipediaSearch(args[0]);
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void ActionOpenWeatherForecast(string[] args)
@@ -191,7 +210,7 @@ namespace Termix
         {
             string musician = string.IsNullOrEmpty(args[0]) ? args[1] : args[0];
 
-            string response = httpClient.GetStringAsync("https://www.youtube.com/results?search_query=" + HttpUtility.UrlEncode(musician)).Result;
+            string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(musician)).Result;
             string decoded = HttpUtility.HtmlDecode(response);
 
             Regex regex = new Regex("<a href=\"(/watch\\?v=.+?&list=.+?)\"[^<>]*aria-label=\"Mix YouTube\">");

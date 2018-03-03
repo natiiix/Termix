@@ -55,9 +55,16 @@
             return double.NaN;
         }
 
-        public static void GoogleSearch(string searchQuery)
-        {
-            Windows.OpenURLInWebBrowser("https://www.google.com/search?q=" + System.Web.HttpUtility.UrlEncode(searchQuery));
-        }
+        public static string GetGoogleSearchURL(string searchQuery) => "https://www.google.com/search?q=" + System.Web.HttpUtility.UrlEncode(searchQuery);
+
+        public static string GetYouTubeSearchURL(string searchQuery) => "https://www.youtube.com/results?search_query=" + System.Web.HttpUtility.UrlEncode(searchQuery);
+
+        public static string GetWikipediaSearchURL(string searchQuery) => "https://en.wikipedia.org/wiki/" + System.Web.HttpUtility.UrlEncode(searchQuery.Replace(' ', '_'));
+
+        public static void GoogleSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetGoogleSearchURL(searchQuery));
+
+        public static void YouTubeSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetYouTubeSearchURL(searchQuery));
+
+        public static void WikipediaSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetWikipediaSearchURL(searchQuery));
     }
 }

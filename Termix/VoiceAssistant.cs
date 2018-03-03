@@ -115,7 +115,7 @@ namespace Termix
             });
 
             // Problem solving
-            RegisterCommand("search (?:for )?(.+)", ActionSearch);
+            RegisterCommand("search (?:for )?(.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
             RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
