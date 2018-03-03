@@ -262,12 +262,14 @@ namespace Termix
 
         private void ActionPlayYouTubeMix(string[] args)
         {
-            if (args.Length != 1)
+            if (args.Length != 2)
             {
                 return;
             }
 
-            string response = httpClient.GetStringAsync("https://www.youtube.com/results?search_query=" + HttpUtility.UrlEncode(args[0])).Result;
+            string musician = string.IsNullOrEmpty(args[0]) ? args[1] : args[0];
+
+            string response = httpClient.GetStringAsync("https://www.youtube.com/results?search_query=" + HttpUtility.UrlEncode(musician)).Result;
             string decoded = HttpUtility.HtmlDecode(response);
 
             Regex regex = new Regex("<a href=\"(/watch\\?v=.+?&list=.+?)\"[^<>]*aria-label=\"Mix YouTube\">");
@@ -275,12 +277,12 @@ namespace Termix
 
             if (match.Success && match.Groups.Count == 2)
             {
-                Speak($"Playing {args[0]} mix on YouTube");
+                Speak($"Playing {musician} mix on YouTube");
                 Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
             }
             else
             {
-                Speak($"Unable to find {args[0]} mix on YouTube");
+                Speak($"Unable to find {musician} mix on YouTube");
             }
         }
 
