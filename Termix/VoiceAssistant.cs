@@ -85,6 +85,8 @@ namespace Termix
             RegisterCommand("scroll up|press page up", ActionScrollUp);
             RegisterCommand("close (?:(?:the(?: active)?|this) )?window", ActionCloseWindow);
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
+            RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
+            RegisterCommand("open (?:the )?(?:MS |ms)?paint", ActionOpenPaint);
 
             // Chess
             RegisterCommand("(?:make a )?move from ([A-H][1-8]) to ([A-H][1-8])", x =>

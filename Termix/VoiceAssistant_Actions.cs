@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace Termix
 {
@@ -287,6 +288,28 @@ namespace Termix
 
             Speak("Closing the active window");
             SendKeysWait("%{F4}");
+        }
+
+        private void ActionOpenCalc(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Opening the calculator");
+            Process.Start("calc");
+        }
+
+        private void ActionOpenPaint(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Opening the MS paint");
+            Process.Start("mspaint");
         }
 
         private void ActionBrowserNewTab(string[] args)
