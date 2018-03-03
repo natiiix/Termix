@@ -59,7 +59,7 @@
 
         public static string GetYouTubeSearchURL(string searchQuery) => "https://www.youtube.com/results?search_query=" + System.Web.HttpUtility.UrlEncode(searchQuery);
 
-        public static string GetWikipediaSearchURL(string searchQuery) => "https://en.wikipedia.org/wiki/" + System.Web.HttpUtility.UrlEncode(searchQuery.Replace(' ', '_'));
+        public static string GetWikipediaSearchURL(string searchQuery) => "https://en.wikipedia.org/w/index.php?search=" + System.Web.HttpUtility.UrlEncode(searchQuery);
 
         public static void GoogleSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetGoogleSearchURL(searchQuery));
 
