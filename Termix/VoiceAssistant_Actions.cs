@@ -232,6 +232,12 @@ namespace Termix
             Speak("It is currently " + DateTime.Now.ToShortTimeString());
         }
 
+        private void ActionReadJoke(string[] args)
+        {
+            string[] jokes = Properties.Resources.JokeDataSet.Split("\r\n");
+            Speak(jokes[new Random().Next(jokes.Length)]);
+        }
+
         private void ActionScrollDown(string[] args)
         {
             Speak("Scrolling down");

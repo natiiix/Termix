@@ -121,6 +121,7 @@ namespace Termix
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
             RegisterCommand("play (?:me )?(?:something from (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
+            RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
 
             // Browser
             RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);

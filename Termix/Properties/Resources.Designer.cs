@@ -59,5 +59,22 @@ namespace Termix.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to What did the bartender say to the jumper cables? You better not try to start anything.
+        ///Don&apos;t you hate jokes about German sausage? They&apos;re the wurst!
+        ///Two artists had an art contest... It ended in a draw
+        ///Why did the chicken cross the playground? To get to the other slide.
+        ///What gun do you use to hunt a moose? A moosecut!
+        ///If life gives you melons, you might have dyslexia.
+        ///Broken pencils... ...are pointless.
+        ///What did one snowman say to the other snowman? &apos;Do you smell carrots?&apos;
+        ///How many hipsters does it  [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string JokeDataSet {
+            get {
+                return ResourceManager.GetString("JokeDataSet", resourceCulture);
+            }
+        }
     }
 }

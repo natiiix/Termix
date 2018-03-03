@@ -11,6 +11,8 @@ namespace Termix
 
         public static string[] SplitWords(this string str) => str.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
+        public static string[] Split(this string str, string delimiter, StringSplitOptions options = StringSplitOptions.None) => str.Split(new string[] { delimiter }, options);
+
         public static string TrimSpaces(this string str) => str.Trim(' ');
 
         public static string CapitalizeFirstLetter(this string str)
