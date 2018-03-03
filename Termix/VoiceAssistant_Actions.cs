@@ -275,12 +275,12 @@ namespace Termix
 
             if (match.Success && match.Groups.Count == 2)
             {
-                Speak($"Playing a {args[0]} mix on YouTube");
+                Speak($"Playing {args[0]} mix on YouTube");
                 Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
             }
             else
             {
-                Speak($"Unable to find a {args[0]} mix on YouTube");
+                Speak($"Unable to find {args[0]} mix on YouTube");
             }
         }
 
