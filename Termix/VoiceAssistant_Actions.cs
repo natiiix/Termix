@@ -1,5 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
+using System.Web;
+using System.Text.RegularExpressions;
 
 namespace Termix
 {
@@ -255,6 +257,30 @@ namespace Termix
 
             Speak("Searching for a solution to " + args[0]);
             HelperFunctions.GoogleSearch(args[0]);
+        }
+
+        private void ActionPlayYouTubeMix(string[] args)
+        {
+            if (args.Length != 1)
+            {
+                return;
+            }
+
+            string response = httpClient.GetStringAsync("https://www.youtube.com/results?search_query=" + HttpUtility.UrlEncode(args[0])).Result;
+            string decoded = HttpUtility.HtmlDecode(response);
+
+            Regex regex = new Regex("<a href=\"(/watch\\?v=.+?&list=.+?)\"[^<>]*aria-label=\"Mix YouTube\">");
+            Match match = regex.Match(decoded);
+
+            if (match.Success && match.Groups.Count == 2)
+            {
+                Speak($"Playing a {args[0]} mix on YouTube");
+                Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
+            }
+            else
+            {
+                Speak($"Unable to find a {args[0]} mix on YouTube");
+            }
         }
 
         private void ActionScrollDown(string[] args)

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Windows.Forms;
+using System.Net.Http;
 
 namespace Termix
 {
@@ -12,6 +13,7 @@ namespace Termix
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
+        private HttpClient httpClient;
 
         // Invoke dispatcher
         public delegate void InvokeDispatcherCallback(Action action);
@@ -67,6 +69,8 @@ namespace Termix
 
             synthesizer = new SpeechSynthesizer();
 
+            httpClient = new HttpClient();
+
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             // Assistant
@@ -115,6 +119,7 @@ namespace Termix
             RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
+            RegisterCommand("play (?:a )?(.+?) (?:YouTube )?mix(?: on YouTube)?", ActionPlayYouTubeMix);
 
             // Browser
             RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
