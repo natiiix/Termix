@@ -14,23 +14,16 @@ namespace Termix
 
         private void ActionAssistantRename(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
-            string newName = args[0];
-
             // User is trying to set the assistant's name to an empty string
-            if (newName == string.Empty)
+            if (string.IsNullOrEmpty(args[0]))
             {
                 Speak("The assistant must have a name!");
             }
             else
             {
-                Speak("Changing my name to " + newName);
+                Speak("Changing my name to " + args[0]);
 
-                Properties.Settings.Default.Name = newName;
+                Properties.Settings.Default.Name = args[0];
                 Properties.Settings.Default.Save();
 
                 invokeDispatcher(() => LoadAssistantName());
@@ -39,22 +32,12 @@ namespace Termix
 
         private void ActionAssistantShutDown(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Shutting down the assistant");
             closeMainWindow();
         }
 
         private void ActionIncreaseActivationSensitivity(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
             double change = ACTIVATION_SENSITIVITY_STEP;
 
             if (args[0] != string.Empty)
@@ -86,11 +69,6 @@ namespace Termix
 
         private void ActionDecreaseActivationSensitivity(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
             double change = ACTIVATION_SENSITIVITY_STEP;
 
             if (args[0] != string.Empty)
@@ -122,11 +100,6 @@ namespace Termix
 
         private void ActionResetSettings(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Resetting assistant settings to their default values");
 
             Properties.Settings.Default.Reset();
@@ -135,83 +108,42 @@ namespace Termix
 
         private void ActionType(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
-            string textToType = args[0];
-
-            Speak("Typing: " + textToType);
-            TypeText(textToType);
+            Speak("Typing: " + args[0]);
+            TypeText(args[0]);
         }
 
         private void ActionSearch(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
-            string searchText = args[0];
-
-            Speak("Searching for " + searchText);
-            HelperFunctions.GoogleSearch(searchText);
+            Speak("Searching for " + args[0]);
+            HelperFunctions.GoogleSearch(args[0]);
         }
 
         private void ActionOpenWeatherForecast(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Opening weather forecast");
             HelperFunctions.GoogleSearch("weather forecast");
         }
 
         private void ActionOpenUserDirectory(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
-            string dirName = args[0];
-
-            Speak("Opening your " + dirName + " directory");
-            Windows.OpenDirectoryInExplorer("%userprofile%\\" + dirName);
+            Speak("Opening your " + args[0] + " directory");
+            Windows.OpenDirectoryInExplorer("%userprofile%\\" + args[0]);
         }
 
         private void ActionPressEnter(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Pressing enter");
             SendKeys.SendWait("{ENTER}");
         }
 
         private void ActionPressSpace(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Pressing spacebar");
             SendKeys.SendWait(" ");
         }
 
         private void ActionSolveMathProblem(string[] args)
         {
-            if (args.Length != 3)
-            {
-                return;
-            }
-
             if (double.TryParse(args[0], out double leftOperand) && double.TryParse(args[2], out double rightOperand))
             {
                 switch (args[1])
@@ -251,22 +183,12 @@ namespace Termix
 
         private void ActionGoogleMathProblem(string[] args)
         {
-            if (args.Length != 1)
-            {
-                return;
-            }
-
             Speak("Searching for a solution to " + args[0]);
             HelperFunctions.GoogleSearch(args[0]);
         }
 
         private void ActionPlayYouTubeMix(string[] args)
         {
-            if (args.Length != 2)
-            {
-                return;
-            }
-
             string musician = string.IsNullOrEmpty(args[0]) ? args[1] : args[0];
 
             string response = httpClient.GetStringAsync("https://www.youtube.com/results?search_query=" + HttpUtility.UrlEncode(musician)).Result;
@@ -293,110 +215,60 @@ namespace Termix
 
         private void ActionScrollDown(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Scrolling down");
             SendKeysWait("{PGDN}");
         }
 
         private void ActionScrollUp(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Scrolling up");
             SendKeysWait("{PGUP}");
         }
 
         private void ActionCloseWindow(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Closing the active window");
             SendKeysWait("%{F4}");
         }
 
         private void ActionOpenCalc(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Opening the calculator");
             Process.Start("calc");
         }
 
         private void ActionOpenPaint(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Opening the MS paint");
             Process.Start("mspaint");
         }
 
         private void ActionBrowserNewTab(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Opening a new tab");
             SendKeysWait("^{t}");
         }
 
         private void ActionBrowserCloseTab(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Closing the active tab");
             SendKeysWait("^{w}");
         }
 
         private void ActionBrowserReopenTab(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Reopening the last closed tab");
             SendKeysWait("^+{t}");
         }
 
         private void ActionBrowserNextTab(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Switching to the next tab");
             SendKeysWait("^{TAB}");
         }
 
         private void ActionBrowserPreviousTab(string[] args)
         {
-            if (args.Length != 0)
-            {
-                return;
-            }
-
             Speak("Switching to the previous tab");
             SendKeysWait("^+{TAB}");
         }
