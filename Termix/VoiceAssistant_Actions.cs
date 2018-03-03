@@ -8,7 +8,7 @@ namespace Termix
         private const double MINIMUM_ACTIVATION_SENSITIVITY = 0.05;
         private const double MAXIMUM_ACTIVATION_SENSITIVITY = 0.4;
 
-        private void ActionRename(string[] args)
+        private void ActionAssistantRename(string[] args)
         {
             if (args.Length != 1)
             {
@@ -33,7 +33,7 @@ namespace Termix
             }
         }
 
-        private void ActionClose(string[] args)
+        private void ActionAssistantShutDown(string[] args)
         {
             if (args.Length != 0)
             {
@@ -254,6 +254,94 @@ namespace Termix
 
             Speak("Searching for a solution to " + args[0]);
             HelperFunctions.GoogleSearch(args[0]);
+        }
+
+        private void ActionScrollDown(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Scrolling down");
+            SendKeysWait("{PGDN}");
+        }
+
+        private void ActionScrollUp(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Scrolling up");
+            SendKeysWait("{PGUP}");
+        }
+
+        private void ActionCloseWindow(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Closing the active window");
+            SendKeysWait("%{F4}");
+        }
+
+        private void ActionBrowserNewTab(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Opening a new tab");
+            SendKeysWait("^{t}");
+        }
+
+        private void ActionBrowserCloseTab(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Closing the active tab");
+            SendKeysWait("^{w}");
+        }
+
+        private void ActionBrowserReopenTab(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Reopening the last closed tab");
+            SendKeysWait("^+{t}");
+        }
+
+        private void ActionBrowserNextTab(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Switching to the next tab");
+            SendKeysWait("^{TAB}");
+        }
+
+        private void ActionBrowserPreviousTab(string[] args)
+        {
+            if (args.Length != 0)
+            {
+                return;
+            }
+
+            Speak("Switching to the previous tab");
+            SendKeysWait("^+{TAB}");
         }
     }
 }

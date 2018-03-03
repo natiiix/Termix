@@ -69,31 +69,57 @@ namespace Termix
 
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
+            // Assistant
             RegisterCommand("do nothing|don't do anything|stop listening", _ => Speak("ok"));
-            RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionClose);
-            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionRename);
+            RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionAssistantShutDown);
+            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
             RegisterCommand(@"increase (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionIncreaseActivationSensitivity);
             RegisterCommand(@"decrease (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionDecreaseActivationSensitivity);
             RegisterCommand("reset assistant settings", ActionResetSettings);
 
+            // Operating system
             RegisterCommand("(?:type|write) (.+)", ActionType);
             RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
             RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
-            RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop) (?:directory|folder|library)?", ActionOpenUserDirectory);
+            RegisterCommand("scroll down|press page down", ActionScrollDown);
+            RegisterCommand("scroll up|press page up", ActionScrollUp);
+            RegisterCommand("close (?:(?:the(?: active)?|this) )?window", ActionCloseWindow);
+            RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
 
-            RegisterCommand("move from ([A-H][1-8]) to ([A-H][1-8])", x =>
+            // Chess
+            RegisterCommand("(?:make a )?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
                 Speak($"Making a chess move from {x[0]} to {x[1]}");
                 System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
             });
 
+            RegisterCommand("(?:open|start) chess", x =>
+            {
+                Speak("Opening chess");
+                Process.Start(new ProcessStartInfo("Chess.exe") { WorkingDirectory = "../Chess/" });
+            });
+
+            RegisterCommand("(?:close|stop) chess", x =>
+            {
+                Speak("Closing chess");
+                foreach (Process proc in Process.GetProcessesByName("Chess"))
+                {
+                    proc.CloseMainWindow();
+                }
+            });
+
+            // Problem solving
             RegisterCommand("search (?:for )?(.+)", ActionSearch);
             RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
 
-            RegisterCommand("open (?:a )?new tab", _ => SendKeysWait("^{t}"), AssistantMode.Browser);
-            RegisterCommand("close (?:(?:the|this) )?tab", _ => SendKeysWait("^{w}"), AssistantMode.Browser);
+            // Browser
+            RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
+            RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
+            RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
+            RegisterCommand("switch (?:to (?:the )?next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
+            RegisterCommand("switch to (?:the )?previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
