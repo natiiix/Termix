@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using System.Web;
 using System.Text.RegularExpressions;
@@ -281,6 +282,11 @@ namespace Termix
             {
                 Speak($"Unable to find a {args[0]} mix on YouTube");
             }
+        }
+
+        private void ActionReadTime(string[] args)
+        {
+            Speak("It is currently " + DateTime.Now.ToShortTimeString());
         }
 
         private void ActionScrollDown(string[] args)
