@@ -93,7 +93,7 @@ namespace Termix
             RegisterCommand("open (?:the )?(?:MS |ms)?paint", ActionOpenPaint);
 
             // Chess
-            RegisterCommand("(?:make a )?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
+            RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
                 Speak($"Making a chess move from {x[0]} to {x[1]}");
                 System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
