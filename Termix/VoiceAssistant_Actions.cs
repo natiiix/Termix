@@ -322,5 +322,17 @@ namespace Termix
             Speak("Switching to the previous tab");
             SendKeysWait("^+{TAB}");
         }
+
+        private void ActionBrowserBack(string[] args)
+        {
+            Speak("Going to the previous page");
+            SendKeysWait("%{LEFT}");
+        }
+
+        private void ActionBrowserForward(string[] args)
+        {
+            Speak("Going to the next page");
+            SendKeysWait("%{RIGHT}");
+        }
     }
 }

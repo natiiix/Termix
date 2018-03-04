@@ -131,6 +131,8 @@ namespace Termix
             RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
             RegisterCommand("switch (?:to (?:the )?next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
             RegisterCommand("switch to (?:the )?previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
+            RegisterCommand("go (?:back|to (?:the )(?:previous|last) page)", ActionBrowserBack, AssistantMode.Browser);
+            RegisterCommand("go (?:forward|to (?:the )next page)", ActionBrowserForward, AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
