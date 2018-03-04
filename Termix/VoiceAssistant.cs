@@ -91,10 +91,9 @@ namespace Termix
 
             // Keyboard
             RegisterCommand("(?:type|write) (.+)", ActionType);
-            RegisterCommand("scroll down|press page down", ActionScrollDown);
-            RegisterCommand("scroll up|press page up", ActionScrollUp);
-            RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
-            RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
+            RegisterCommand("scroll down", ActionScrollDown);
+            RegisterCommand("scroll up", ActionScrollUp);
+            RegisterCommand("press (?:the )?(.+?)(?: key)?(?: (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (?:times|\\*))?", ActionPressKey);
 
             // Problem solving - offline
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);

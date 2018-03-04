@@ -1,19 +1,13 @@
-﻿namespace Termix
+﻿using System;
+using System.Linq;
+
+namespace Termix
 {
     public static class HelperFunctions
     {
-        public static double GetNumberFromString(string str)
+        public static int GetNumberFromWord(string word)
         {
-            if (double.TryParse(str, out double value))
-            {
-                return value;
-            }
-            else if (str.EndsWith("%") && double.TryParse(str.Substring(0, str.Length - 1), out double percent))
-            {
-                return percent / 100d;
-            }
-
-            switch (str)
+            switch (word)
             {
                 case "zero":
                     return 0;
@@ -49,10 +43,39 @@
                     return 10;
 
                 default:
-                    break;
+                    throw new ArgumentException();
+            }
+        }
+
+        public static int GetIntFromString(string str)
+        {
+            if (int.TryParse(str, out int value))
+            {
+                return value;
             }
 
-            return double.NaN;
+            return GetNumberFromWord(str);
+        }
+
+        public static double GetDoubleFromString(string str)
+        {
+            if (double.TryParse(str, out double value))
+            {
+                return value;
+            }
+            else if (str.EndsWith("%") && double.TryParse(str.Substring(0, str.Length - 1), out double percent))
+            {
+                return percent / 100d;
+            }
+
+            try
+            {
+                return GetIntFromString(str);
+            }
+            catch
+            {
+                return double.NaN;
+            }
         }
 
         public static string GetGoogleSearchURL(string searchQuery) => "https://www.google.com/search?q=" + System.Web.HttpUtility.UrlEncode(searchQuery);
@@ -66,5 +89,7 @@
         public static void YouTubeSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetYouTubeSearchURL(searchQuery));
 
         public static void WikipediaSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetWikipediaSearchURL(searchQuery));
+
+        public static string GetNonEmptyString(params string[] arr) => arr.Single(x => !string.IsNullOrEmpty(x));
     }
 }

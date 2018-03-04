@@ -42,7 +42,7 @@ namespace Termix
 
             if (args[1] != string.Empty)
             {
-                change = HelperFunctions.GetNumberFromString(args[1]);
+                change = HelperFunctions.GetDoubleFromString(args[1]);
 
                 if (double.IsNaN(change))
                 {
@@ -136,18 +136,6 @@ namespace Termix
             Windows.OpenDirectoryInExplorer("%userprofile%\\" + args[0]);
         }
 
-        private void ActionPressEnter(string[] args)
-        {
-            Speak("Pressing enter");
-            SendKeys.SendWait("{ENTER}");
-        }
-
-        private void ActionPressSpace(string[] args)
-        {
-            Speak("Pressing spacebar");
-            SendKeys.SendWait(" ");
-        }
-
         private void ActionSolveMathProblem(string[] args)
         {
             if (double.TryParse(args[0], out double leftOperand) && double.TryParse(args[2], out double rightOperand))
@@ -195,7 +183,7 @@ namespace Termix
 
         private void ActionPlayYouTubeMix(string[] args)
         {
-            string musician = string.IsNullOrEmpty(args[0]) ? args[1] : args[0];
+            string musician = HelperFunctions.GetNonEmptyString(args);
 
             string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(musician)).Result;
             string decoded = HttpUtility.HtmlDecode(response);
@@ -242,6 +230,71 @@ namespace Termix
         {
             string[] jokes = Properties.Resources.JokeDataSet.Split("\r\n");
             Speak(jokes[new Random().Next(jokes.Length)]);
+        }
+
+        private void ActionPressKey(string[] args)
+        {
+            string key = string.Empty;
+
+            Regex regex = new Regex("^(?:(.)|(left|right|up|down)(?: arrow)?|(F(?:[1-9]|1[0-6])|enter|backspace|delete|insert|tab|end|home))$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            Match match = regex.Match(args[0]);
+
+            if (match.Success && match.Groups.Count == 4)
+            {
+                if (!string.IsNullOrEmpty(match.Groups[1].Value))
+                {
+                    key = match.Groups[1].Value;
+                }
+                else
+                {
+                    key = "{" + HelperFunctions.GetNonEmptyString(match.Groups[2].Value, match.Groups[3].Value).ToUpper() + "}";
+                }
+            }
+            else
+            {
+                switch (args[0].ToLower())
+                {
+                    case "space":
+                    case "space bar":
+                        key = " ";
+                        break;
+
+                    case "page up":
+                        key = "{PGUP}";
+                        break;
+
+                    case "page down":
+                        key = "{PGDN}";
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                if (string.IsNullOrEmpty(args[1]))
+                {
+                    Speak($"Pressing the {args[0]} key");
+                    SendKeys.SendWait(key);
+                }
+                else
+                {
+                    int times = HelperFunctions.GetIntFromString(args[1]);
+
+                    Speak($"Pressing the {args[0]} key {times} times");
+
+                    for (int i = 0; i < times; i++)
+                    {
+                        SendKeys.SendWait(key);
+                    }
+                }
+            }
+            else
+            {
+                Speak(args[0] + " is not a valid name of a key");
+            }
         }
 
         private void ActionScrollDown(string[] args)
