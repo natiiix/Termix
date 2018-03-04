@@ -8,5 +8,8 @@
     <Setting Name="ActivationSensitivity" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.15</Value>
     </Setting>
+    <Setting Name="VoiceFeedback" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">True</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

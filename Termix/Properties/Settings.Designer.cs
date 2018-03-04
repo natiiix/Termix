@@ -46,5 +46,17 @@ namespace Termix.Properties {
                 this["ActivationSensitivity"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool VoiceFeedback {
+            get {
+                return ((bool)(this["VoiceFeedback"]));
+            }
+            set {
+                this["VoiceFeedback"] = value;
+            }
+        }
     }
 }

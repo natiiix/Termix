@@ -77,8 +77,8 @@ namespace Termix
             RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", _ => Speak("ok"));
             RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionAssistantShutDown);
             RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
-            RegisterCommand(@"increase (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionIncreaseActivationSensitivity);
-            RegisterCommand(@"decrease (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionDecreaseActivationSensitivity);
+            RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
+            RegisterCommand("(enable|disable) (?:the )?(?:(?:voice )?feedback|speech synthesis)", ActionSetVoiceFeedback);
             RegisterCommand("reset (?:the )?assistant (?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
@@ -194,7 +194,11 @@ namespace Termix
         private void Speak(string text)
         {
             appendLog("[Assistant] " + text);
-            synthesizer.SpeakAsync(text);
+
+            if (Properties.Settings.Default.VoiceFeedback)
+            {
+                synthesizer.SpeakAsync(text);
+            }
         }
 
         private void HandleCommand(string cmd)

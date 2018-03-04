@@ -36,74 +36,61 @@ namespace Termix
             closeMainWindow();
         }
 
-        private void ActionIncreaseActivationSensitivity(string[] args)
+        private void ActionChangeActivationSensitivity(string[] args)
         {
             double change = ACTIVATION_SENSITIVITY_STEP;
 
-            if (args[0] != string.Empty)
+            if (args[1] != string.Empty)
             {
-                change = HelperFunctions.GetNumberFromString(args[0]);
+                change = HelperFunctions.GetNumberFromString(args[1]);
 
                 if (double.IsNaN(change))
                 {
-                    Speak(args[0] + " is not a valid numeric value");
+                    Speak(args[1] + " is not a valid numeric value");
                     return;
                 }
+            }
+
+            if (args[0] == "decrease")
+            {
+                change = -change;
             }
 
             double newSens = Properties.Settings.Default.ActivationSensitivity + change;
 
             if (newSens > MAXIMUM_ACTIVATION_SENSITIVITY)
             {
-                Speak("Setting actication sensitivity to its maximum value");
+                Speak($"Setting the actication sensitivity to its maximum value {MAXIMUM_ACTIVATION_SENSITIVITY}");
                 Properties.Settings.Default.ActivationSensitivity = MAXIMUM_ACTIVATION_SENSITIVITY;
             }
-            else
+            else if (newSens < MINIMUM_ACTIVATION_SENSITIVITY)
             {
-                Speak("Increasing activation sensitivity to " + newSens.ToString());
-                Properties.Settings.Default.ActivationSensitivity = newSens;
-            }
-
-            Properties.Settings.Default.Save();
-        }
-
-        private void ActionDecreaseActivationSensitivity(string[] args)
-        {
-            double change = ACTIVATION_SENSITIVITY_STEP;
-
-            if (args[0] != string.Empty)
-            {
-                change = HelperFunctions.GetNumberFromString(args[0]);
-
-                if (double.IsNaN(change))
-                {
-                    Speak(args[0] + " is not a valid numeric value");
-                    return;
-                }
-            }
-
-            double newSens = Properties.Settings.Default.ActivationSensitivity - change;
-
-            if (newSens < MINIMUM_ACTIVATION_SENSITIVITY)
-            {
-                Speak("Setting actication sensitivity to its minimum value");
+                Speak($"Setting the actication sensitivity to its minimum value {MINIMUM_ACTIVATION_SENSITIVITY}");
                 Properties.Settings.Default.ActivationSensitivity = MINIMUM_ACTIVATION_SENSITIVITY;
             }
             else
             {
-                Speak("Decreasing activation sensitivity to " + newSens.ToString());
+                Speak($"Changing the activation sensitivity to {newSens}");
                 Properties.Settings.Default.ActivationSensitivity = newSens;
             }
 
             Properties.Settings.Default.Save();
         }
 
+        private void ActionSetVoiceFeedback(string[] args)
+        {
+            Properties.Settings.Default.VoiceFeedback = args[0] == "enable";
+            Properties.Settings.Default.Save();
+
+            Speak($"Voice feedback has been {args[0]}d");
+        }
+
         private void ActionResetSettings(string[] args)
         {
-            Speak("Resetting assistant settings to their default values");
-
             Properties.Settings.Default.Reset();
             invokeDispatcher(() => LoadAssistantName());
+
+            Speak("All assistant settings have been reset to their default values");
         }
 
         private void ActionType(string[] args)
