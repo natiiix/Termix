@@ -74,12 +74,12 @@ namespace Termix
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             // Assistant
-            RegisterCommand("do nothing|don't do anything|stop listening", _ => Speak("ok"));
+            RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", _ => Speak("ok"));
             RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionAssistantShutDown);
-            RegisterCommand("(?:change (?:your )?(?:name|activation(?: command)?)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
+            RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
             RegisterCommand(@"increase (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionIncreaseActivationSensitivity);
             RegisterCommand(@"decrease (?:the )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionDecreaseActivationSensitivity);
-            RegisterCommand("reset assistant settings", ActionResetSettings);
+            RegisterCommand("reset (?:the )?assistant (?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
             RegisterCommand("(?:type|write) (.+)", ActionType);
