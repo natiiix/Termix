@@ -200,7 +200,7 @@ namespace Termix
             string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(musician)).Result;
             string decoded = HttpUtility.HtmlDecode(response);
 
-            Regex regex = new Regex("<a href=\"(/watch\\?v=[a-zA-Z0-9_]+?&list=[a-zA-Z0-9_]+?)\"[^<>]*?aria-label=\"Mix YouTube\">");
+            Regex regex = new Regex("<a href=\"(/watch\\?v=[a-zA-Z0-9_-]{11}&list=[a-zA-Z0-9_-]+?)\"[^<>]*?aria-label=\"Mix YouTube\">");
             Match match = regex.Match(decoded);
 
             if (match.Success && match.Groups.Count == 2)
@@ -219,7 +219,7 @@ namespace Termix
             string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(args[0])).Result;
             string decoded = HttpUtility.HtmlDecode(response);
 
-            Regex regex = new Regex("<a[^<>]*?href=\"(/watch\\?v=[a-zA-Z0-9_]+?)\"[^<>]*?title=\"([^\"]*?)\"[^<>]*?>");
+            Regex regex = new Regex("<a[^<>]*?href=\"(/watch\\?v=[a-zA-Z0-9_-]{11})\"[^<>]*?title=\"([^\"]*?)\"[^<>]*?>");
             Match match = regex.Match(decoded);
 
             if (match.Success && match.Groups.Count == 3)
