@@ -1,51 +1,24 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Termix
 {
     public static class HelperFunctions
     {
-        public static int GetNumberFromWord(string word)
+        public static readonly Dictionary<string, int> NumberWords = new Dictionary<string, int>()
         {
-            switch (word)
-            {
-                case "zero":
-                    return 0;
-
-                case "one":
-                    return 1;
-
-                case "two":
-                    return 2;
-
-                case "three":
-                    return 3;
-
-                case "four":
-                    return 4;
-
-                case "five":
-                    return 5;
-
-                case "six":
-                    return 6;
-
-                case "seven":
-                    return 7;
-
-                case "eight":
-                    return 8;
-
-                case "nine":
-                    return 9;
-
-                case "ten":
-                    return 10;
-
-                default:
-                    throw new ArgumentException();
-            }
-        }
+            { "zero", 0 },
+            { "one", 1 },
+            { "two", 2 },
+            { "three", 3 },
+            { "four", 4 },
+            { "five", 5 },
+            { "six", 6 },
+            { "seven", 7 },
+            { "eight", 8 },
+            { "nine", 9 },
+            { "ten", 10 }
+        };
 
         public static int GetIntFromString(string str)
         {
@@ -54,7 +27,7 @@ namespace Termix
                 return value;
             }
 
-            return GetNumberFromWord(str);
+            return NumberWords[str];
         }
 
         public static double GetDoubleFromString(string str)
@@ -70,9 +43,9 @@ namespace Termix
 
             try
             {
-                return GetIntFromString(str);
+                return NumberWords[str];
             }
-            catch
+            catch (KeyNotFoundException)
             {
                 return double.NaN;
             }
