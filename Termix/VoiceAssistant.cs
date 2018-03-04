@@ -119,7 +119,7 @@ namespace Termix
             RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
-            RegisterCommand("play (?:me )?(?:something from (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
+            RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
 
