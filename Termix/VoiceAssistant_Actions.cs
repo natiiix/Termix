@@ -287,6 +287,12 @@ namespace Termix
             Process.Start("mspaint");
         }
 
+        private void ActionOpenWebBrowser(string[] args)
+        {
+            Speak("Opening the web browser");
+            Process.Start("chrome");
+        }
+
         private void ActionOpenWebpage(string[] args)
         {
             Speak("Opening " + args[0]);

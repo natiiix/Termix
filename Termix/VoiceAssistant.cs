@@ -82,16 +82,40 @@ namespace Termix
             RegisterCommand("reset (?:the )?assistant (?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
-            RegisterCommand("(?:type|write) (.+)", ActionType);
-            RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
-            RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
-            RegisterCommand("scroll down|press page down", ActionScrollDown);
-            RegisterCommand("scroll up|press page up", ActionScrollUp);
             RegisterCommand("close (?:(?:the(?: active)?|this) )?window", ActionCloseWindow);
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
             RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
             RegisterCommand("open (?:the )?(?:MS |ms)?paint", ActionOpenPaint);
+            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?new (?:web )?browser window)", ActionOpenWebBrowser);
             RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
+
+            // Keyboard
+            RegisterCommand("(?:type|write) (.+)", ActionType);
+            RegisterCommand("scroll down|press page down", ActionScrollDown);
+            RegisterCommand("scroll up|press page up", ActionScrollUp);
+            RegisterCommand("press (?:the )?enter(?: key)?", ActionPressEnter);
+            RegisterCommand("press (?:the )?(?:space|space bar)(?: key)?", ActionPressSpace);
+
+            // Problem solving - offline
+            RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
+            RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
+            RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
+
+            // Problem solving - online
+            RegisterCommand("open (?:the )?weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
+            RegisterCommand("search (?:for )?(.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
+            RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
+            RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
+
+            // Browser
+            RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
+            RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
+            RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
+            RegisterCommand("switch (?:to (?:the )?next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
+            RegisterCommand("switch to (?:the )?previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
+            RegisterCommand("go (?:back|to (?:the )(?:previous|last) page)", ActionBrowserBack, AssistantMode.Browser);
+            RegisterCommand("go (?:forward|to (?:the )next page)", ActionBrowserForward, AssistantMode.Browser);
 
             // Chess
             RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
@@ -114,25 +138,6 @@ namespace Termix
                     proc.CloseMainWindow();
                 }
             });
-
-            // Problem solving
-            RegisterCommand("search (?:for )?(.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
-            RegisterCommand("open weather forecast", ActionOpenWeatherForecast);
-            RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
-            RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
-            RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
-            RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
-            RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
-            RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
-
-            // Browser
-            RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
-            RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
-            RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
-            RegisterCommand("switch (?:to (?:the )?next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
-            RegisterCommand("switch to (?:the )?previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
-            RegisterCommand("go (?:back|to (?:the )(?:previous|last) page)", ActionBrowserBack, AssistantMode.Browser);
-            RegisterCommand("go (?:forward|to (?:the )next page)", ActionBrowserForward, AssistantMode.Browser);
         }
 
         private void OfflineRecognizer_SpeechRecognized(object sender, SpeechRecognizedEventArgs e)
