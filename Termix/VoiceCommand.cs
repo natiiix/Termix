@@ -12,7 +12,7 @@ namespace Termix
         public VoiceCommand(string regex, Action<string[]> action, AssistantMode mode = AssistantMode.All)
         {
             Mode = mode;
-            RegExPattern = new Regex($"^{regex}$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
+            RegExPattern = new Regex($"^(?:{regex})$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
             CommandAction = action;
         }
 
