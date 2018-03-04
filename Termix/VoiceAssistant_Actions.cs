@@ -213,7 +213,7 @@ namespace Termix
             string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(musician)).Result;
             string decoded = HttpUtility.HtmlDecode(response);
 
-            Regex regex = new Regex("<a href=\"(/watch\\?v=.+?&list=.+?)\"[^<>]*aria-label=\"Mix YouTube\">");
+            Regex regex = new Regex("<a href=\"(/watch\\?v=[a-zA-Z0-9_]+?&list=[a-zA-Z0-9_]+?)\"[^<>]*?aria-label=\"Mix YouTube\">");
             Match match = regex.Match(decoded);
 
             if (match.Success && match.Groups.Count == 2)
@@ -224,6 +224,25 @@ namespace Termix
             else
             {
                 Speak($"Unable to find {musician} mix on YouTube");
+            }
+        }
+
+        private void ActionPlayYouTubeVideo(string[] args)
+        {
+            string response = httpClient.GetStringAsync(HelperFunctions.GetYouTubeSearchURL(args[0])).Result;
+            string decoded = HttpUtility.HtmlDecode(response);
+
+            Regex regex = new Regex("<a[^<>]*?href=\"(/watch\\?v=[a-zA-Z0-9_]+?)\"[^<>]*?title=\"([^\"]*?)\"[^<>]*?>");
+            Match match = regex.Match(decoded);
+
+            if (match.Success && match.Groups.Count == 3)
+            {
+                Speak($"Playing a YouTube video called {match.Groups[2].Value}");
+                Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
+            }
+            else
+            {
+                Speak($"Unable to find a YouTube video called {args[0]}");
             }
         }
 
@@ -266,6 +285,12 @@ namespace Termix
         {
             Speak("Opening the MS paint");
             Process.Start("mspaint");
+        }
+
+        private void ActionOpenWebpage(string[] args)
+        {
+            Speak("Opening " + args[0]);
+            Windows.OpenURLInWebBrowser($"http://{args[0]}.com");
         }
 
         private void ActionBrowserNewTab(string[] args)

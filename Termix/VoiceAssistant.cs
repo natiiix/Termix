@@ -91,6 +91,7 @@ namespace Termix
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
             RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
             RegisterCommand("open (?:the )?(?:MS |ms)?paint", ActionOpenPaint);
+            RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
 
             // Chess
             RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
@@ -120,6 +121,7 @@ namespace Termix
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
             RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
+            RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
 
