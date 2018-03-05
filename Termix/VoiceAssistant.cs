@@ -86,7 +86,7 @@ namespace Termix
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
             RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
             RegisterCommand("open (?:the )?(?:MS |ms)?paint", ActionOpenPaint);
-            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?new (?:web )?browser window)", ActionOpenWebBrowser);
+            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
             RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
 
             // Keyboard
