@@ -8,7 +8,7 @@ namespace Termix
 {
     public partial class VoiceAssistant
     {
-        private const double ACTIVATION_SENSITIVITY_STEP = 0.01;
+        private const double ACTIVATION_SENSITIVITY_STEP = 0.05;
         private const double MINIMUM_ACTIVATION_SENSITIVITY = 0.05;
         private const double MAXIMUM_ACTIVATION_SENSITIVITY = 0.4;
 
