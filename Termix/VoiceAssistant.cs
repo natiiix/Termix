@@ -95,6 +95,9 @@ namespace Termix
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand("press (?:the )?(.+?)(?: key)?(?: (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (?:times|\\*))?", ActionPressKey);
 
+            // Mouse
+            RegisterCommand("move (?:the )?(?:mouse(?: cursor)?|cursor) (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
+
             // Problem solving - offline
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);

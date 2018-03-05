@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Web;
 using System.Text.RegularExpressions;
+using System.Drawing;
 
 namespace Termix
 {
@@ -307,6 +308,33 @@ namespace Termix
         {
             Speak("Scrolling up");
             SendKeysWait("{PGUP}");
+        }
+
+        private void ActionMoveCursor(string[] args)
+        {
+            int distance = HelperFunctions.GetIntFromString(args[0]);
+
+            switch (args[1])
+            {
+                case "left":
+                    Cursor.Position = new Point(Math.Max(Cursor.Position.X - distance, 0), Cursor.Position.Y);
+                    break;
+
+                case "right":
+                    Cursor.Position = new Point(Math.Min(Cursor.Position.X + distance, Screen.PrimaryScreen.Bounds.Width - 1), Cursor.Position.Y);
+                    break;
+
+                case "up":
+                    Cursor.Position = new Point(Cursor.Position.X, Math.Max(Cursor.Position.Y - distance, 0));
+                    break;
+
+                case "down":
+                    Cursor.Position = new Point(Cursor.Position.X, Math.Min(Cursor.Position.Y + distance, Screen.PrimaryScreen.Bounds.Height - 1));
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void ActionCloseWindow(string[] args)
