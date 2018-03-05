@@ -148,7 +148,7 @@
     <Compile Include="VoiceAssistant.cs" />
     <Compile Include="VoiceCommand.cs" />
     <Compile Include="VoiceCommandList.cs" />
-    <Compile Include="WindowsTools.cs" />
+    <Compile Include="WinApi.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

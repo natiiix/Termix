@@ -97,6 +97,7 @@ namespace Termix
 
             // Mouse
             RegisterCommand("move (?:the )?(?:mouse(?: cursor)?|cursor) (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
+            RegisterCommand("(?:(?:do|perform) (?:a )?)?(left|right|middle) (?:mouse )?click(?: (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (?:times|\\*))?", ActionMouseClick);
 
             // Problem solving - offline
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
@@ -250,7 +251,7 @@ namespace Termix
 
         private AssistantMode GetCurrentAssistantMode()
         {
-            Process proc = Windows.GetForegroundProcess();
+            Process proc = WinApi.GetForegroundProcess();
             string procName = proc.ProcessName;
             string windowTitle = proc.MainWindowTitle;
 

@@ -57,11 +57,11 @@ namespace Termix
 
         public static string GetWikipediaSearchURL(string searchQuery) => "https://en.wikipedia.org/w/index.php?search=" + System.Web.HttpUtility.UrlEncode(searchQuery);
 
-        public static void GoogleSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetGoogleSearchURL(searchQuery));
+        public static void GoogleSearch(string searchQuery) => WinApi.OpenURLInWebBrowser(GetGoogleSearchURL(searchQuery));
 
-        public static void YouTubeSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetYouTubeSearchURL(searchQuery));
+        public static void YouTubeSearch(string searchQuery) => WinApi.OpenURLInWebBrowser(GetYouTubeSearchURL(searchQuery));
 
-        public static void WikipediaSearch(string searchQuery) => Windows.OpenURLInWebBrowser(GetWikipediaSearchURL(searchQuery));
+        public static void WikipediaSearch(string searchQuery) => WinApi.OpenURLInWebBrowser(GetWikipediaSearchURL(searchQuery));
 
         public static string GetNonEmptyString(params string[] arr) => arr.Single(x => !string.IsNullOrEmpty(x));
     }

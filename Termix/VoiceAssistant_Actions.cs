@@ -134,7 +134,7 @@ namespace Termix
         private void ActionOpenUserDirectory(string[] args)
         {
             Speak("Opening your " + args[0] + " directory");
-            Windows.OpenDirectoryInExplorer("%userprofile%\\" + args[0]);
+            WinApi.OpenDirectoryInExplorer("%userprofile%\\" + args[0]);
         }
 
         private void ActionSolveMathProblem(string[] args)
@@ -195,7 +195,7 @@ namespace Termix
             if (match.Success && match.Groups.Count == 2)
             {
                 Speak($"Playing {musician} mix on YouTube");
-                Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
+                WinApi.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
             }
             else
             {
@@ -214,7 +214,7 @@ namespace Termix
             if (match.Success && match.Groups.Count == 3)
             {
                 Speak($"Playing a YouTube video called {match.Groups[2].Value}");
-                Windows.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
+                WinApi.OpenURLInWebBrowser("https://www.youtube.com" + match.Groups[1].Value);
             }
             else
             {
@@ -314,26 +314,72 @@ namespace Termix
         {
             int distance = HelperFunctions.GetIntFromString(args[0]);
 
+            string messageBase = $"Moving the mouse cursor {distance} pixels";
+
             switch (args[1])
             {
                 case "left":
+                    Speak(messageBase + " to the left");
                     Cursor.Position = new Point(Math.Max(Cursor.Position.X - distance, 0), Cursor.Position.Y);
                     break;
 
                 case "right":
+                    Speak(messageBase + " to the right");
                     Cursor.Position = new Point(Math.Min(Cursor.Position.X + distance, Screen.PrimaryScreen.Bounds.Width - 1), Cursor.Position.Y);
                     break;
 
                 case "up":
+                    Speak(messageBase + " up");
                     Cursor.Position = new Point(Cursor.Position.X, Math.Max(Cursor.Position.Y - distance, 0));
                     break;
 
                 case "down":
+                    Speak(messageBase + " down");
                     Cursor.Position = new Point(Cursor.Position.X, Math.Min(Cursor.Position.Y + distance, Screen.PrimaryScreen.Bounds.Height - 1));
                     break;
 
                 default:
                     break;
+            }
+        }
+
+        private void ActionMouseClick(string[] args)
+        {
+            Action actionClick = null;
+
+            switch (args[0])
+            {
+                case "left":
+                    actionClick = WinApi.Mouse.LeftClick;
+                    break;
+
+                case "right":
+                    actionClick = WinApi.Mouse.RightClick;
+                    break;
+
+                case "middle":
+                    actionClick = WinApi.Mouse.MiddleClick;
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (string.IsNullOrEmpty(args[1]))
+            {
+                Speak($"Clicking with the {args[0]} mouse button");
+                actionClick();
+            }
+            else
+            {
+                int times = HelperFunctions.GetIntFromString(args[1]);
+
+                Speak($"Clicking with the {args[0]} mouse button {times} times");
+
+                for (int i = 0; i < times; i++)
+                {
+                    actionClick();
+                }
             }
         }
 
@@ -364,7 +410,7 @@ namespace Termix
         private void ActionOpenWebpage(string[] args)
         {
             Speak("Opening " + args[0]);
-            Windows.OpenURLInWebBrowser($"http://{args[0]}.com");
+            WinApi.OpenURLInWebBrowser($"http://{args[0]}.com");
         }
 
         private void ActionBrowserNewTab(string[] args)
