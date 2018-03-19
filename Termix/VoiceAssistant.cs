@@ -94,7 +94,7 @@ namespace Termix
             // Volume
             RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)?(?: sounds?)?(?: volume)?", ActionMuteSound);
             RegisterCommand($"(?:change|set) (?:the )?(?:system )?(?:playback )?(?:sound )?volume to ({NUMBERS}) ?(?:%|percent)?", ActionSetVolume);
-            RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume by ({NUMBERS}) ?(?:%|percent)?", ActionChangeVolume);
+            RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
 
             // Keyboard
             RegisterCommand("(?:type|write) (.+)", ActionType);

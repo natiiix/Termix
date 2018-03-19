@@ -420,7 +420,7 @@ namespace Termix
 
         private void ActionChangeVolume(string[] args)
         {
-            int volumePercent = HelperFunctions.GetIntFromString(args[1]);
+            int volumePercent = string.IsNullOrEmpty(args[1]) ? 2 : HelperFunctions.GetIntFromString(args[1]);
             int oldVolume = WinApi.Volume.PlaybackVolume;
 
             switch (args[0])
