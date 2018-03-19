@@ -11,6 +11,7 @@ namespace Termix
     public partial class VoiceAssistant
     {
         private const string NUMBERS = @"zero|one|two|three|four|five|six|seven|eight|nine|ten|\d+";
+        private readonly static string[] PROMPTS = { "How can I help you?", "How may I help you?", "How can I assist you?", "How may I assist you?", "What can I do for you?" };
 
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
@@ -112,7 +113,7 @@ namespace Termix
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
 
             // Problem solving - online
-            RegisterCommand("open (?:the )?weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand("(?:open(?: up)?|show me|display) (?:the )?weather forecast", ActionOpenWeatherForecast);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
             RegisterCommand("search (?:for )?(.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
             RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
@@ -172,7 +173,7 @@ namespace Termix
 
             // Let the user know the assistant is listening
             setRecognitionLabelText("Listening...");
-            Speak("How can I help you?");
+            Speak(PROMPTS[new Random().Next(PROMPTS.Length)]);
 
             // Listen and recognize
             await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
