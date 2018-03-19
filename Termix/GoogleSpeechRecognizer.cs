@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.Speech.V1;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -18,7 +19,7 @@ namespace Termix
 
         // Final form of a speech segment has been recognized
         // Currently without timeout => the recognition will not continue once the final result was recognized
-        private static readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(0);
+        private static readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(5);
 
         public static async Task<object> StreamingMicRecognizeAsync(Action<string> finalRecognitionAction, Action<string> partialRecognitionAction)
         {
@@ -61,18 +62,20 @@ namespace Termix
             // Print responses as they arrive
             Task printResponses = Task.Run(async () =>
             {
-                while (await streamingCall.ResponseStream.MoveNext(default(System.Threading.CancellationToken)))
+                while (await streamingCall.ResponseStream.MoveNext(default(CancellationToken)))
                 {
                     foreach (StreamingRecognitionResult result in streamingCall.ResponseStream.Current.Results)
                     {
                         foreach (SpeechRecognitionAlternative alternative in result.Alternatives)
                         {
+                            string transcript = alternative.Transcript.TrimSpaces();
+
                             // Final recognition result
                             if (result.IsFinal)
                             {
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_AFTER_FINAL;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                                Task.Factory.StartNew(() => finalRecognitionAction(alternative.Transcript));
+                                Task.Factory.StartNew(() => finalRecognitionAction(transcript));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                             }
                             // Recognition continues
@@ -80,7 +83,7 @@ namespace Termix
                             {
                                 dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_PARTIAL;
 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                                Task.Factory.StartNew(() => partialRecognitionAction(alternative.Transcript));
+                                Task.Factory.StartNew(() => partialRecognitionAction(transcript));
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
                             }
                         }
@@ -105,10 +108,17 @@ namespace Termix
                         return;
                     }
 
-                    streamingCall.WriteAsync(new StreamingRecognizeRequest()
+                    try
                     {
-                        AudioContent = Google.Protobuf.ByteString.CopyFrom(args.Buffer, 0, args.BytesRecorded)
-                    }).Wait();
+                        streamingCall.WriteAsync(new StreamingRecognizeRequest()
+                        {
+                            AudioContent = Google.Protobuf.ByteString.CopyFrom(args.Buffer, 0, args.BytesRecorded)
+                        }).Wait();
+                    }
+                    catch
+                    {
+                        return;
+                    }
                 }
             };
 
