@@ -27,5 +27,7 @@ namespace Termix
 
             return firstCharCapital + remainder;
         }
+
+        public static int RoundToInt(this double value) => (int)Math.Round(value);
     }
 }

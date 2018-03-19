@@ -18,7 +18,7 @@ namespace Termix
             // User is trying to set the assistant's name to an empty string
             if (string.IsNullOrEmpty(args[0]))
             {
-                Speak("The assistant must have a name!");
+                Speak("The assistant must have a name");
             }
             else
             {
@@ -387,6 +387,65 @@ namespace Termix
         {
             Speak("Closing the active window");
             SendKeysWait("%{F4}");
+        }
+
+        private void ActionMuteSound(string[] args)
+        {
+            switch (args[0])
+            {
+                case "unmute":
+                case "enable":
+                    WinApi.Volume.PlaybackMuted = false;
+                    Speak("Sound has been unmuted");
+                    break;
+
+                case "mute":
+                case "disable":
+                    WinApi.Volume.PlaybackMuted = true;
+                    Speak("Sound has been muted");
+                    break;
+
+                default:
+                    break;
+            }
+        }
+
+        private void ActionSetVolume(string[] args)
+        {
+            int volumePercent = Math.Min(HelperFunctions.GetIntFromString(args[0]), 100);
+
+            Speak($"Changing the sound volume to {volumePercent} percent");
+            WinApi.Volume.PlaybackVolume = volumePercent;
+        }
+
+        private void ActionChangeVolume(string[] args)
+        {
+            int volumePercent = HelperFunctions.GetIntFromString(args[1]);
+            int oldVolume = WinApi.Volume.PlaybackVolume;
+
+            switch (args[0])
+            {
+                case "increase":
+                    {
+                        int newVolume = Math.Min(oldVolume + volumePercent, 100);
+
+                        Speak($"Increasing the sound volume by {newVolume - oldVolume} percent");
+                        WinApi.Volume.PlaybackVolume = newVolume;
+                    }
+                    break;
+
+                case "decrease":
+                    {
+                        int newVolume = Math.Max(oldVolume - volumePercent, 0);
+
+                        Speak($"Decreasing the sound volume by {oldVolume - newVolume} percent");
+                        WinApi.Volume.PlaybackVolume = newVolume;
+                    }
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void ActionOpenCalc(string[] args)

@@ -10,6 +10,8 @@ namespace Termix
 {
     public partial class VoiceAssistant
     {
+        private const string NUMBERS = @"zero|one|two|three|four|five|six|seven|eight|nine|ten|\d+";
+
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
         private VoiceCommandList cmdList;
@@ -89,15 +91,20 @@ namespace Termix
             RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
             RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
 
+            // Volume
+            RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)?(?: sounds?)?(?: volume)?", ActionMuteSound);
+            RegisterCommand($"(?:change|set) (?:the )?(?:system )?(?:playback )?(?:sound )?volume to ({NUMBERS}) ?(?:%|percent)?", ActionSetVolume);
+            RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume by ({NUMBERS}) ?(?:%|percent)?", ActionChangeVolume);
+
             // Keyboard
             RegisterCommand("(?:type|write) (.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
-            RegisterCommand("press (?:the )?(.+?)(?: key)?(?: (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (?:times|\\*))?", ActionPressKey);
+            RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
 
             // Mouse
-            RegisterCommand("move (?:the )?(?:mouse(?: cursor)?|cursor) (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
-            RegisterCommand("(?:(?:do|perform) (?:a )?)?(left|right|middle) (?:mouse )?click(?: (zero|one|two|three|four|five|six|seven|eight|nine|ten|\\d+) (?:times|\\*))?", ActionMouseClick);
+            RegisterCommand($"move (?:the )?(?:mouse(?: cursor)?|cursor) ({NUMBERS}) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
+            RegisterCommand($@"(?:(?:do|perform) (?:a )?)?(left|right|middle) (?:mouse )?click(?: ({NUMBERS}) (?:times|\*))?", ActionMouseClick);
 
             // Problem solving - offline
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
