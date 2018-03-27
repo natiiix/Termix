@@ -281,17 +281,17 @@ namespace Termix
                 Clipboard.SetText(text);
 
                 // Press Ctrl+V to paste the text in the clipboard
-
-                // Sometime applications (Facebook Messenger)
-                // seem to ignore this method key combination.
-                // Presumably it's because the keys are pressed too briefly.
-                //SendKeys.SendWait("^{v}");
-
                 WinApi.Keyboard.Down(System.Windows.Input.Key.LeftCtrl);
                 System.Threading.Thread.Sleep(10);
                 WinApi.Keyboard.Press(System.Windows.Input.Key.V);
                 System.Threading.Thread.Sleep(10);
                 WinApi.Keyboard.Up(System.Windows.Input.Key.LeftCtrl);
+
+                // Alternative (old) way to press Ctrl+V.
+                // Some applications (Facebook Messenger) seem to ignore
+                // this method of pressing Ctrl+V.
+                // Presumably because the keys are being pressed too briefly.
+                //SendKeys.SendWait("^{v}");
 
                 // Set the clipboard data back to the original data
                 if (oldText != null && oldText != string.Empty)
