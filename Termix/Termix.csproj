@@ -148,6 +148,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AssistantMode.cs" />
+    <Compile Include="AssistantData.cs" />
+    <Compile Include="DataAlias.cs" />
     <Compile Include="HelperFunctions.cs" />
     <Compile Include="VoiceAssistant_Actions.cs" />
     <Compile Include="GoogleSpeechRecognizer.cs" />

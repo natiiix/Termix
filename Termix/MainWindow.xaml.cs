@@ -56,7 +56,14 @@ namespace Termix
             }
         }
 
-        private void InvokeDispatcher(Action action) => Dispatcher?.Invoke(action);
+        private void InvokeDispatcher(Action action)
+        {
+            try
+            {
+                Dispatcher?.Invoke(action);
+            }
+            catch (System.Threading.Tasks.TaskCanceledException) { }
+        }
 
         private void AppendLog(string text)
         {

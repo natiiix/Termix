@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.Web;
@@ -99,6 +100,12 @@ namespace Termix
             invokeDispatcher(() => LoadAssistantName());
 
             Speak("All assistant settings have been reset to their default values");
+        }
+
+        private void ActionEnterData(string[] args)
+        {
+            Speak("Entering " + args[0]);
+            TypeText(data.Aliases.First(x => x.ContainsAlternative(args[0])).Value);
         }
 
         private void ActionType(string[] args)
@@ -229,6 +236,14 @@ namespace Termix
             }
         }
 
+        private void ActionOpenFacebookChat(string[] args)
+        {
+            Speak("Opening your Facebook chat with " + args[0]);
+
+            string id = data.FacebookContacts.First(x => x.ContainsAlternative(args[0])).Value;
+            WinApi.OpenURLInWebBrowser("https://www.facebook.com/messages/t/" + id);
+        }
+
         private void ActionReadTime(string[] args)
         {
             Speak("It is currently " + DateTime.Now.ToShortTimeString());
@@ -303,6 +318,18 @@ namespace Termix
             {
                 Speak(args[0] + " is not a valid name of a key");
             }
+        }
+
+        private void ActionSelectAll(string[] args)
+        {
+            Speak("Selecting all");
+            SendKeysWait("^{a}");
+        }
+
+        private void ActionSendMessage(string[] args)
+        {
+            Speak("Sending the message");
+            SendKeysWait("{ENTER}");
         }
 
         private void ActionScrollDown(string[] args)

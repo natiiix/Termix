@@ -22,7 +22,7 @@ namespace Termix
 
         public void HandleInput(string input, AssistantMode mode)
         {
-            foreach (VoiceCommand cmd in Commands.Where(x => x.Mode.HasFlag(mode)))
+            foreach (VoiceCommand cmd in Commands.Where(x => (mode & x.Mode) != 0))
             {
                 if (cmd.DoActionIfMatch(input))
                 {

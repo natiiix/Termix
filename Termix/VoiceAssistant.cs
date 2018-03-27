@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Windows.Forms;
@@ -12,11 +13,13 @@ namespace Termix
     {
         private const string NUMBERS = @"zero|one|two|three|four|five|six|seven|eight|nine|ten|\d+";
         private readonly static string[] PROMPTS = { "How can I help you?", "How may I help you?", "How can I assist you?", "How may I assist you?", "What can I do for you?" };
+        private readonly static string DATA_DIR = AppDomain.CurrentDomain.BaseDirectory + "/data/";
 
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
-        private VoiceCommandList cmdList;
         private HttpClient httpClient;
+        private VoiceCommandList cmdList;
+        private AssistantData data;
 
         // Invoke dispatcher
         public delegate void InvokeDispatcherCallback(Action action);
@@ -71,16 +74,26 @@ namespace Termix
             ActivateOfflineRecognizer();
 
             synthesizer = new SpeechSynthesizer();
-
             httpClient = new HttpClient();
-
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
+
+            try
+            {
+                data = new AssistantData(DATA_DIR);
+            }
+            catch (ArgumentException ex)
+            {
+                invokeDispatcher(() =>
+                {
+                    MessageBox.Show(ex.Message, "Error: Invalid Data");
+                });
+            }
 
             // Assistant
             RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", ActionStopListening);
-            RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionAssistantShutDown);
+            RegisterCommand("close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down|shut it down", ActionAssistantShutDown);
             RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
-            RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
+            RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation(?: command)? sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
             RegisterCommand("(enable|disable) (?:the )?(?:(?:voice )?feedback|speech synthesis)", ActionSetVoiceFeedback);
             RegisterCommand("reset (?:the )?assistant (?:settings|options|configuration)", ActionResetSettings);
 
@@ -98,10 +111,18 @@ namespace Termix
             RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
 
             // Keyboard
-            RegisterCommand("(?:type|write)(?:(?: the)? (?:following sentence|following|sentence))? (.+)", ActionType);
+            if (data.Aliases.Length > 0)
+            {
+                string listOfAlternatives = string.Join("|", data.Aliases.Select(x => string.Join("|", x.Alternatives)));
+                RegisterCommand($"(?:type|write|enter)(?: (?:my|the))?? ({listOfAlternatives})", ActionEnterData);
+            }
+
+            RegisterCommand("(?:type|write)(?: (?:the )?(?:following sentence|following|sentence))? (.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
+            RegisterCommand("select all(?: the)?(?: text)?", ActionSelectAll);
+            RegisterCommand("send(?: the)? message", ActionSendMessage, AssistantMode.Messenger);
 
             // Mouse
             RegisterCommand($"move (?:the )?(?:mouse(?: cursor)?|cursor) ({NUMBERS}) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
@@ -119,6 +140,12 @@ namespace Termix
             RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
             RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
 
+            if (data.FacebookContacts.Length > 0)
+            {
+                string listOfAlternatives = string.Join("|", data.FacebookContacts.Select(x => string.Join("|", x.Alternatives)));
+                RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:the|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
+            }
+
             // Browser
             RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
             RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
@@ -132,13 +159,13 @@ namespace Termix
             RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
                 Speak($"Making a chess move from {x[0]} to {x[1]}");
-                System.IO.File.AppendAllText("../Chess/log.txt", x[0] + x[1]);
+                System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + "/../Chess/log.txt", x[0] + x[1]);
             });
 
             RegisterCommand("(?:open|start) chess", x =>
             {
                 Speak("Opening chess");
-                Process.Start(new ProcessStartInfo("Chess.exe") { WorkingDirectory = "../Chess/" });
+                Process.Start(new ProcessStartInfo("Chess.exe") { WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory + "/../Chess/" });
             });
 
             RegisterCommand("(?:close|stop) chess", x =>
@@ -181,7 +208,17 @@ namespace Termix
             GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
                 x =>
                 {
-                    HandleCommand(x);
+                    string name = Properties.Settings.Default.Name;
+
+                    if (x.ToLower().StartsWith(name.ToLower()))
+                    {
+                        HandleCommand(x.Substring(name.Length).TrimSpaces());
+                    }
+                    else
+                    {
+                        HandleCommand(x);
+                    }
+
                     setRecognitionLabelText(LISTENING_TEXT);
                 },
                 x => setRecognitionLabelText(x)
@@ -244,10 +281,17 @@ namespace Termix
                 Clipboard.SetText(text);
 
                 // Press Ctrl+V to paste the text in the clipboard
-                //Windows.Keyboard.Down(Key.LeftCtrl);
-                //Windows.Keyboard.Press(Key.V);
-                //Windows.Keyboard.Up(Key.LeftCtrl);
-                SendKeys.SendWait("^{v}");
+
+                // Sometime applications (Facebook Messenger)
+                // seem to ignore this method key combination.
+                // Presumably it's because the keys are pressed too briefly.
+                //SendKeys.SendWait("^{v}");
+
+                WinApi.Keyboard.Down(System.Windows.Input.Key.LeftCtrl);
+                System.Threading.Thread.Sleep(10);
+                WinApi.Keyboard.Press(System.Windows.Input.Key.V);
+                System.Threading.Thread.Sleep(10);
+                WinApi.Keyboard.Up(System.Windows.Input.Key.LeftCtrl);
 
                 // Set the clipboard data back to the original data
                 if (oldText != null && oldText != string.Empty)
@@ -270,14 +314,19 @@ namespace Termix
             string procName = proc.ProcessName;
             string windowTitle = proc.MainWindowTitle;
 
-            switch (procName)
-            {
-                case "chrome":
-                    return AssistantMode.Browser;
+            AssistantMode mode = AssistantMode.Default;
 
-                default:
-                    return AssistantMode.Default;
+            if (procName == "chrome")
+            {
+                mode |= AssistantMode.Browser;
             }
+
+            if (windowTitle == "Messenger - Google Chrome")
+            {
+                mode |= AssistantMode.Messenger;
+            }
+
+            return mode;
         }
     }
 }
