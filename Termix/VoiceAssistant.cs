@@ -115,7 +115,7 @@ namespace Termix
             // Problem solving - online
             RegisterCommand("(?:open(?: up)?|show me|display) (?:the )?weather forecast", ActionOpenWeatherForecast);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
-            RegisterCommand("search (?:for )?(.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
+            RegisterCommand("(?:search(?: for)?|find|show me) (.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
             RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
             RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
 
