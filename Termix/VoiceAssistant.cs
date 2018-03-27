@@ -77,7 +77,7 @@ namespace Termix
             cmdList = new VoiceCommandList(x => Speak("I do not understand: " + x));
 
             // Assistant
-            RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", _ => Speak("ok"));
+            RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", ActionStopListening);
             RegisterCommand("(?:close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down)", ActionAssistantShutDown);
             RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
             RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
@@ -98,7 +98,7 @@ namespace Termix
             RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
 
             // Keyboard
-            RegisterCommand("(?:type|write) (.+)", ActionType);
+            RegisterCommand("(?:type|write)(?:(?: the)? (?:following sentence|following|sentence))? (.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
@@ -164,27 +164,34 @@ namespace Termix
             cmdList.AddCommand(new VoiceCommand(regex, action, mode));
         }
 
-        public async void Listen()
+        public void Listen()
         {
+            const string LISTENING_TEXT = "Listening...";
+
             // Disable the offline speech recognizer
             offlineRecognizer.RecognizeAsyncCancel();
             // Switch the UI to listening mode
             updateListeningUI(true);
 
             // Let the user know the assistant is listening
-            setRecognitionLabelText("Listening...");
+            setRecognitionLabelText(LISTENING_TEXT);
             Speak(PROMPTS[new Random().Next(PROMPTS.Length)]);
 
             // Listen and recognize
-            await GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
-                HandleCommand,
+            GoogleSpeechRecognizer.StreamingMicRecognizeAsync(
+                x =>
+                {
+                    HandleCommand(x);
+                    setRecognitionLabelText(LISTENING_TEXT);
+                },
                 x => setRecognitionLabelText(x)
-                );
-
-            // Switch the UI back to idle mode
-            updateListeningUI(false);
-            // Re-enable the offline speech recognizer
-            ActivateOfflineRecognizer();
+            ).ContinueWith(_ =>
+            {
+                // Switch the UI back to idle mode
+                updateListeningUI(false);
+                // Re-enable the offline speech recognizer
+                ActivateOfflineRecognizer();
+            });
         }
 
         private void LoadAssistantName()

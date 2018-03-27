@@ -13,6 +13,12 @@ namespace Termix
         private const double MINIMUM_ACTIVATION_SENSITIVITY = 0.05;
         private const double MAXIMUM_ACTIVATION_SENSITIVITY = 0.4;
 
+        private void ActionStopListening(string[] args)
+        {
+            Speak("Okay");
+            GoogleSpeechRecognizer.StopListening = true;
+        }
+
         private void ActionAssistantRename(string[] args)
         {
             // User is trying to set the assistant's name to an empty string
@@ -34,6 +40,7 @@ namespace Termix
         private void ActionAssistantShutDown(string[] args)
         {
             Speak("Shutting down the assistant");
+            GoogleSpeechRecognizer.StopListening = true;
             closeMainWindow();
         }
 

@@ -18,10 +18,11 @@ namespace Termix
         private static readonly TimeSpan RECOGNITION_TIMEOUT_PARTIAL = TimeSpan.FromSeconds(5);
 
         // Final form of a speech segment has been recognized
-        // Currently without timeout => the recognition will not continue once the final result was recognized
         private static readonly TimeSpan RECOGNITION_TIMEOUT_AFTER_FINAL = TimeSpan.FromSeconds(5);
 
-        public static async Task<object> StreamingMicRecognizeAsync(Action<string> finalRecognitionAction, Action<string> partialRecognitionAction)
+        public static bool StopListening { get; set; } = false;
+
+        public static async Task<int> StreamingMicRecognizeAsync(Action<string> finalRecognitionAction, Action<string> partialRecognitionAction)
         {
             DateTime dtTimeout = DateTime.Now + RECOGNITION_TIMEOUT_INITIAL;
 
@@ -62,7 +63,7 @@ namespace Termix
             // Print responses as they arrive
             Task printResponses = Task.Run(async () =>
             {
-                while (await streamingCall.ResponseStream.MoveNext(default(CancellationToken)))
+                while (!StopListening && await streamingCall.ResponseStream.MoveNext(default(CancellationToken)))
                 {
                     foreach (StreamingRecognitionResult result in streamingCall.ResponseStream.Current.Results)
                     {
@@ -94,10 +95,17 @@ namespace Termix
             // Audio recorded
             waveIn.DataAvailable += (object sender, NAudio.Wave.WaveInEventArgs args) =>
             {
+                if (StopListening)
+                {
+                    return;
+                }
+
                 lock (writeLock)
                 {
                     if (!writeMore)
+                    {
                         return;
+                    }
 
                     // Timed out
                     if (DateTime.Now >= dtTimeout)
@@ -115,10 +123,7 @@ namespace Termix
                             AudioContent = Google.Protobuf.ByteString.CopyFrom(args.Buffer, 0, args.BytesRecorded)
                         }).Wait();
                     }
-                    catch
-                    {
-                        return;
-                    }
+                    catch { }
                 }
             };
 
@@ -126,7 +131,7 @@ namespace Termix
             waveIn.StartRecording();
 
             // Wait for the recording to stop
-            while (writeMore)
+            while (!StopListening && writeMore)
             {
                 await Task.Delay(TimeSpan.FromSeconds(1));
             }
@@ -135,6 +140,7 @@ namespace Termix
             await streamingCall.WriteCompleteAsync();
             await printResponses;
 
+            StopListening = false;
             return 0;
         }
     }
