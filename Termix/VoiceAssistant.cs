@@ -122,6 +122,7 @@ namespace Termix
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
             RegisterCommand("select all(?: the)?(?: text)?", ActionSelectAll);
+            RegisterCommand("(copy|cut|paste)(?:(?: (?:to|into|from))? clipboard)?", ActionClipboard);
             RegisterCommand("send(?: the)? message", ActionSendMessage, AssistantMode.Messenger);
 
             // Mouse
@@ -132,6 +133,7 @@ namespace Termix
             RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
+            RegisterCommand("take(?: a)? screenshot", ActionScreenshot);
 
             // Problem solving - online
             RegisterCommand("(?:open(?: up)?|show me|display) (?:the )?weather forecast", ActionOpenWeatherForecast);

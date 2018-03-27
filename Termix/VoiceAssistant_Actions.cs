@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace Termix
 {
@@ -255,6 +256,23 @@ namespace Termix
             Speak(jokes[new Random().Next(jokes.Length)]);
         }
 
+        private void ActionScreenshot(string[] args)
+        {
+            Speak("Taking a screenshot");
+
+            Rectangle bounds = Screen.PrimaryScreen.Bounds;
+
+            using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
+            {
+                using (Graphics g = Graphics.FromImage(bitmap))
+                {
+                    g.CopyFromScreen(bounds.Location, Point.Empty, bounds.Size);
+                }
+
+                invokeDispatcher(() => Clipboard.SetImage(bitmap));
+            }
+        }
+
         private void ActionPressKey(string[] args)
         {
             string key = string.Empty;
@@ -324,6 +342,30 @@ namespace Termix
         {
             Speak("Selecting all");
             SendKeysWait("^{a}");
+        }
+
+        private void ActionClipboard(string[] args)
+        {
+            switch (args[0])
+            {
+                case "copy":
+                    Speak("Copying");
+                    SendKeysWait("^{c}");
+                    break;
+
+                case "cut":
+                    Speak("Cutting");
+                    SendKeysWait("^{x}");
+                    break;
+
+                case "paste":
+                    Speak("Pasting");
+                    SendKeysWait("^{v}");
+                    break;
+
+                default:
+                    break;
+            }
         }
 
         private void ActionSendMessage(string[] args)
