@@ -544,7 +544,7 @@ namespace Termix
 
         private void ActionOpenPaint(string[] args)
         {
-            Speak("Opening the MS paint");
+            Speak("Opening Microsoft Paint");
             Process.Start("mspaint");
         }
 
