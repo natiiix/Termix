@@ -106,7 +106,7 @@ namespace Termix
             RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
 
             // Volume
-            RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)?(?: sounds?)?(?: volume)?", ActionMuteSound);
+            RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)? (?:sounds? volume|sounds?|volume)", ActionMuteSound);
             RegisterCommand($"(?:change|set) (?:the )?(?:system )?(?:playback )?(?:sound )?volume to ({NUMBERS}) ?(?:%|percent)?", ActionSetVolume);
             RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
 
