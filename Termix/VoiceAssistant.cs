@@ -13,7 +13,7 @@ namespace Termix
     {
         private const string NUMBERS = @"zero|one|two|three|four|five|six|seven|eight|nine|ten|\d+";
         private readonly static string[] PROMPTS = { "How can I help you?", "How may I help you?", "How can I assist you?", "How may I assist you?", "What can I do for you?" };
-        private readonly static string DATA_DIR = AppDomain.CurrentDomain.BaseDirectory + "/data/";
+        private readonly static string DATA_DIR = AppDomain.CurrentDomain.BaseDirectory + @"data\";
 
         private SpeechRecognitionEngine offlineRecognizer;
         private SpeechSynthesizer synthesizer;
@@ -162,13 +162,13 @@ namespace Termix
             RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
                 Speak($"Making a chess move from {x[0]} to {x[1]}");
-                System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + "/../Chess/log.txt", x[0] + x[1]);
+                System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"..\Chess\log.txt", x[0] + x[1]);
             });
 
             RegisterCommand("(?:open|start) chess", x =>
             {
                 Speak("Opening chess");
-                Process.Start(new ProcessStartInfo("Chess.exe") { WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory + "/../Chess/" });
+                Process.Start(new ProcessStartInfo("Chess.exe") { WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory + @"..\Chess\" });
             });
 
             RegisterCommand("(?:close|stop) chess", x =>
