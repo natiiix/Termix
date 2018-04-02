@@ -117,7 +117,7 @@ namespace Termix
                 RegisterCommand($"(?:type|write|enter)(?: (?:the|a|my))?? ({listOfAlternatives})", ActionEnterData);
             }
 
-            RegisterCommand("(?:type|write)(?: (?:the )?(?:following sentence|following|sentence))? ?(.+)", ActionType);
+            RegisterCommand("(?:type|write) ?(.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
