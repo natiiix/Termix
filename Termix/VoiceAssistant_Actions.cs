@@ -368,6 +368,18 @@ namespace Termix
             }
         }
 
+        private void ActionDeleteWord(string[] args)
+        {
+            Speak("Deleting the last word");
+
+            int times = string.IsNullOrEmpty(args[0]) ? 1 : HelperFunctions.GetIntFromString(args[0]);
+
+            for (int i = 0; i < times; i++)
+            {
+                SendKeysWait("^{backspace}");
+            }
+        }
+
         private void ActionSendMessage(string[] args)
         {
             Speak("Sending the message");

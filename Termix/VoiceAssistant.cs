@@ -114,15 +114,16 @@ namespace Termix
             if (data.Aliases.Length > 0)
             {
                 string listOfAlternatives = string.Join("|", data.Aliases.Select(x => string.Join("|", x.Alternatives)));
-                RegisterCommand($"(?:type|write|enter)(?: (?:my|the))?? ({listOfAlternatives})", ActionEnterData);
+                RegisterCommand($"(?:type|write|enter)(?: (?:the|a|my))?? ({listOfAlternatives})", ActionEnterData);
             }
 
-            RegisterCommand("(?:type|write)(?: (?:the )?(?:following sentence|following|sentence))? (.+)", ActionType);
+            RegisterCommand("(?:type|write)(?: (?:the )?(?:following sentence|following|sentence))? ?(.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
             RegisterCommand("select all(?: the)?(?: text)?", ActionSelectAll);
             RegisterCommand("(copy|cut|paste)(?:(?: (?:to|into|from))? clipboard)?", ActionClipboard);
+            RegisterCommand($"delete(?: the)?(?: (?:last|previous))?(?: ({NUMBERS}))? words?", ActionDeleteWord);
             RegisterCommand("send(?: the)? message", ActionSendMessage, AssistantMode.Messenger);
 
             // Mouse
@@ -130,7 +131,7 @@ namespace Termix
             RegisterCommand($@"(?:(?:do|perform) (?:a )?)?(left|right|middle) (?:mouse )?click(?: ({NUMBERS}) (?:times|\*))?", ActionMouseClick);
 
             // Problem solving - offline
-            RegisterCommand(@"how much is (\d+(?:.\d+)?) (\+|-|\*|/) (\d+(?:.\d+)?)", ActionSolveMathProblem);
+            RegisterCommand(@"how much is (-?\d+(?:.\d+)?) (\+|-|\*|/) (-?\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
             RegisterCommand("take(?: a)? screenshot", ActionScreenshot);
@@ -145,7 +146,7 @@ namespace Termix
             if (data.FacebookContacts.Length > 0)
             {
                 string listOfAlternatives = string.Join("|", data.FacebookContacts.Select(x => string.Join("|", x.Alternatives)));
-                RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:the|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
+                RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:the|a|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
             }
 
             // Browser
@@ -280,13 +281,14 @@ namespace Termix
                 Image oldImage = Clipboard.GetImage();
 
                 // Set the clipboard to the text to type
-                Clipboard.SetText(text);
+                Clipboard.SetText(text, TextDataFormat.UnicodeText);
+                System.Threading.Thread.Sleep(100);
 
                 // Press Ctrl+V to paste the text in the clipboard
                 WinApi.Keyboard.Down(System.Windows.Input.Key.LeftCtrl);
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(20);
                 WinApi.Keyboard.Press(System.Windows.Input.Key.V);
-                System.Threading.Thread.Sleep(10);
+                System.Threading.Thread.Sleep(20);
                 WinApi.Keyboard.Up(System.Windows.Input.Key.LeftCtrl);
 
                 // Alternative (old) way to press Ctrl+V.
