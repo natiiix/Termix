@@ -95,15 +95,15 @@ namespace Termix
             RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
             RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation(?: command)? sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
             RegisterCommand("(enable|disable) (?:the )?(?:(?:voice )?feedback|speech synthesis)", ActionSetVoiceFeedback);
-            RegisterCommand("reset (?:the )?assistant (?:settings|options|configuration)", ActionResetSettings);
+            RegisterCommand("reset (?:the )?(?:assistant )?(?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
             RegisterCommand("close (?:(?:the(?: active)?|this) )?window", ActionCloseWindow);
             RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
+            RegisterCommand("open (?:the )?notepad", ActionOpenNotepad);
             RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
             RegisterCommand("open (?:the )?(?:Microsoft |ms ?)?paint", ActionOpenPaint);
-            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
-            RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
+            RegisterCommand("take(?: a)? screenshot", ActionScreenshot);
 
             // Volume
             RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)? (?:sounds? volume|sounds?|volume)", ActionMuteSound);
@@ -122,7 +122,7 @@ namespace Termix
             RegisterCommand("scroll up", ActionScrollUp);
             RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
             RegisterCommand("select all(?: the)?(?: text)?", ActionSelectAll);
-            RegisterCommand("(copy|cut|paste)(?:(?: (?:to|into|from))? clipboard)?", ActionClipboard);
+            RegisterCommand("(copy|cut|paste)(?:(?: (?:to|into|from))? (?:the )?clipboard)?", ActionClipboard);
             RegisterCommand($"delete(?: the)?(?: (?:last|previous))?(?: ({NUMBERS}))? words?", ActionDeleteWord);
             RegisterCommand("send(?: the)? message", ActionSendMessage, AssistantMode.Messenger);
 
@@ -134,7 +134,6 @@ namespace Termix
             RegisterCommand(@"how much is (-?\d+(?:.\d+)?) (\+|-|\*|/) (-?\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
             RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
-            RegisterCommand("take(?: a)? screenshot", ActionScreenshot);
 
             // Problem solving - online
             RegisterCommand("(?:open(?: up)?|show me|display) (?:the )?weather forecast", ActionOpenWeatherForecast);
@@ -150,6 +149,8 @@ namespace Termix
             }
 
             // Browser
+            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
+            RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
             RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
             RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
             RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);

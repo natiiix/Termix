@@ -536,6 +536,12 @@ namespace Termix
             }
         }
 
+        private void ActionOpenNotepad(string[] args)
+        {
+            Speak("Opening the notepad");
+            Process.Start("notepad");
+        }
+
         private void ActionOpenCalc(string[] args)
         {
             Speak("Opening the calculator");
