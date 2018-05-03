@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Termix
 {
     public class DataAlias
     {
-        public string[] Alternatives { get; private set; }
-        public string Value { get; private set; }
+        public readonly string Pattern;
+        public readonly Regex Regex;
+        public readonly string Value;
 
         public DataAlias(string aliasEntry)
         {
@@ -16,31 +18,9 @@ namespace Termix
                 throw new ArgumentException("Invalid alias entry: " + aliasEntry);
             }
 
-            Alternatives = parts[0].ToLower().Split(',');
+            Pattern = parts[0];
+            Regex = new Regex($"^(?:{parts[0]})$", RegexOptions.Singleline | RegexOptions.IgnoreCase);
             Value = parts[1];
-        }
-
-        public bool ContainsAlternative(string alternative, bool caseSensitive = false)
-        {
-            foreach (string alt in Alternatives)
-            {
-                if (caseSensitive)
-                {
-                    if (alt == alternative)
-                    {
-                        return true;
-                    }
-                }
-                else
-                {
-                    if (alt.ToLower() == alternative.ToLower())
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
     }
 }

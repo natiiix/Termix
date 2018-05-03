@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Windows.Forms;
-using System.Net.Http;
 
 namespace Termix
 {
@@ -83,9 +83,23 @@ namespace Termix
             }
             catch (ArgumentException ex)
             {
-                invokeDispatcher(() =>
+                invokeDispatcher(() => MessageBox.Show(ex.Message, "Error (Invalid Data)"));
+            }
+
+            // User commands
+            foreach (DataAlias cmd in data.UserCommands)
+            {
+                RegisterCommand(cmd.Pattern, args =>
                 {
-                    MessageBox.Show(ex.Message, "Error: Invalid Data");
+                    try
+                    {
+                        Speak("Executing a user command");
+                        Process.Start(cmd.Value);
+                    }
+                    catch (Exception ex)
+                    {
+                        invokeDispatcher(() => MessageBox.Show(ex.Message, "Error (Invalid User Command)"));
+                    }
                 });
             }
 
@@ -113,7 +127,7 @@ namespace Termix
             // Keyboard
             if (data.Aliases.Length > 0)
             {
-                string listOfAlternatives = string.Join("|", data.Aliases.Select(x => string.Join("|", x.Alternatives)));
+                string listOfAlternatives = string.Join("|", data.Aliases.Select(x => string.Join("|", x.Pattern)));
                 RegisterCommand($"(?:type|write|enter)(?: (?:the|a|my))?? ({listOfAlternatives})", ActionEnterData);
             }
 
@@ -144,7 +158,7 @@ namespace Termix
 
             if (data.FacebookContacts.Length > 0)
             {
-                string listOfAlternatives = string.Join("|", data.FacebookContacts.Select(x => string.Join("|", x.Alternatives)));
+                string listOfAlternatives = string.Join("|", data.FacebookContacts.Select(x => string.Join("|", x.Pattern)));
                 RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:the|a|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
             }
 

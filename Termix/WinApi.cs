@@ -1,9 +1,9 @@
-﻿using System;
+﻿using AudioSwitcher.AudioApi;
+using AudioSwitcher.AudioApi.CoreAudio;
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
-using AudioSwitcher.AudioApi;
-using AudioSwitcher.AudioApi.CoreAudio;
 
 namespace Termix
 {

@@ -9,9 +9,11 @@ namespace Termix
 
         private string AliasFilePath { get => dataDirPath + "alias.txt"; }
         private string FacebookFilePath { get => dataDirPath + "facebook.txt"; }
+        private string CommandFilePath { get => dataDirPath + "command.txt"; }
 
         public DataAlias[] Aliases { get; private set; }
         public DataAlias[] FacebookContacts { get; private set; }
+        public DataAlias[] UserCommands { get; private set; }
 
         public AssistantData(string dataDirPath)
         {
@@ -21,6 +23,7 @@ namespace Termix
 
             Aliases = GetAliasesFromFile(AliasFilePath);
             FacebookContacts = GetAliasesFromFile(FacebookFilePath);
+            UserCommands = GetAliasesFromFile(CommandFilePath);
         }
 
         private static DataAlias[] GetAliasesFromFile(string filePath)

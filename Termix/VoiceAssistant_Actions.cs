@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Diagnostics;
-using System.Windows.Forms;
-using System.Web;
-using System.Text.RegularExpressions;
 using System.Drawing;
-using System.Drawing.Imaging;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Web;
+using System.Windows.Forms;
 
 namespace Termix
 {
@@ -106,7 +105,7 @@ namespace Termix
         private void ActionEnterData(string[] args)
         {
             Speak("Entering " + args[0]);
-            TypeText(data.Aliases.First(x => x.ContainsAlternative(args[0])).Value);
+            TypeText(data.Aliases.First(x => x.Regex.IsMatch(args[0])).Value);
         }
 
         private void ActionType(string[] args)
@@ -240,9 +239,7 @@ namespace Termix
         private void ActionOpenFacebookChat(string[] args)
         {
             Speak("Opening your Facebook chat with " + args[0]);
-
-            string id = data.FacebookContacts.First(x => x.ContainsAlternative(args[0])).Value;
-            WinApi.OpenURLInWebBrowser("https://www.facebook.com/messages/t/" + id);
+            WinApi.OpenURLInWebBrowser("https://www.facebook.com/messages/t/" + data.FacebookContacts.First(x => x.Regex.IsMatch(args[0])).Value);
         }
 
         private void ActionReadTime(string[] args)
