@@ -12,6 +12,8 @@ namespace Termix
     public partial class VoiceAssistant
     {
         private const string NUMBERS = @"zero|one|two|three|four|five|six|seven|eight|nine|ten|\d+";
+        private const string ART = "(?:(?:a|the) )?"; // Optional definite/indefinite article followed by a space
+        private const string ART_ONLY = "a|the"; // Only the definite / indefinite article (used when there are more options)
         private readonly static string[] PROMPTS = { "How can I help you?", "How may I help you?", "How can I assist you?", "How may I assist you?", "What can I do for you?" };
         private readonly static string DATA_DIR = AppDomain.CurrentDomain.BaseDirectory + @"data\";
 
@@ -105,76 +107,76 @@ namespace Termix
 
             // Assistant
             RegisterCommand("do nothing|don't do anything|stop listening|never mind|nevermind", ActionStopListening);
-            RegisterCommand("close (?:yourself|the assistant)|shut (?:(?:yourself|the assistant) )?down|shut it down", ActionAssistantShutDown);
-            RegisterCommand("(?:change (?:(?:your|the) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
-            RegisterCommand(@"(increase|decrease) (?:the )?(?:voice )?activation(?: command)? sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
-            RegisterCommand("(enable|disable) (?:the )?(?:(?:voice )?feedback|speech synthesis)", ActionSetVoiceFeedback);
-            RegisterCommand("reset (?:the )?(?:assistant )?(?:settings|options|configuration)", ActionResetSettings);
+            RegisterCommand($"(?:close|shut down) (?:yourself|{ART} assistant)|shut (?:(?:yourself|{ART} assistant) )?down|shut it down", ActionAssistantShutDown);
+            RegisterCommand($"(?:change (?:(?:your|{ART_ONLY}) )?(?:name|activation command)|rename(?: yourself)?) to (.+)", ActionAssistantRename);
+            RegisterCommand($@"(increase|decrease) {ART}(?:voice )?activation(?: command)? sensitivity(?: by (\d+(?:.\d+|%)?))?", ActionChangeActivationSensitivity);
+            RegisterCommand($"(enable|disable) {ART}(?:(?:voice )?feedback|speech synthesis)", ActionSetVoiceFeedback);
+            RegisterCommand($"reset {ART}(?:assistant )?(?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
-            RegisterCommand("close (?:(?:the(?: active)?|this) )?window", ActionCloseWindow);
-            RegisterCommand("open (?:(?:my|the) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
-            RegisterCommand("open (?:the )?notepad", ActionOpenNotepad);
-            RegisterCommand("open (?:the )?calculator", ActionOpenCalc);
-            RegisterCommand("open (?:the )?(?:Microsoft |ms ?)?paint", ActionOpenPaint);
-            RegisterCommand("take(?: a)? screenshot", ActionScreenshot);
+            RegisterCommand($"close (?:(?:{ART}(?:active)?|this) )?window", ActionCloseWindow);
+            RegisterCommand($"open (?:(?:my|{ART_ONLY}) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
+            RegisterCommand($"open {ART}notepad", ActionOpenNotepad);
+            RegisterCommand($"open {ART}calculator", ActionOpenCalc);
+            RegisterCommand($"open {ART}(?:Microsoft |ms ?)?paint", ActionOpenPaint);
+            RegisterCommand($"take {ART}screenshot", ActionScreenshot);
 
             // Volume
-            RegisterCommand("(unmute|mute|enable|disable)(?: all)?(?: of)?(?: the)?(?: system)? (?:sounds? volume|sounds?|volume)", ActionMuteSound);
-            RegisterCommand($"(?:change|set) (?:the )?(?:system )?(?:playback )?(?:sound )?volume to ({NUMBERS}) ?(?:%|percent)?", ActionSetVolume);
-            RegisterCommand($"(increase|decrease) (?:the )?(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
+            RegisterCommand($"(unmute|mute|enable|disable) (?:all )?(?:of )?{ART}(?:system )?(?:sounds? volume|sounds?|volume)", ActionMuteSound);
+            RegisterCommand($"(?:change|set) {ART}(?:system )?(?:playback )?(?:sound )?volume to ({NUMBERS}) ?(?:%|percent)?", ActionSetVolume);
+            RegisterCommand($"(increase|decrease) {ART}(?:system )?(?:playback )?(?:sound )?volume(?: by ({NUMBERS}) ?(?:%|percent)?)?", ActionChangeVolume);
 
             // Keyboard
             if (data.Aliases.Length > 0)
             {
                 string listOfAlternatives = string.Join("|", data.Aliases.Select(x => string.Join("|", x.Pattern)));
-                RegisterCommand($"(?:type|write|enter)(?: (?:the|a|my))?? ({listOfAlternatives})", ActionEnterData);
+                RegisterCommand($"(?:type|write|enter)(?: (?:my|{ART_ONLY}))?? ({listOfAlternatives})", ActionEnterData);
             }
 
             RegisterCommand("(?:type|write) ?(.+)", ActionType);
             RegisterCommand("scroll down", ActionScrollDown);
             RegisterCommand("scroll up", ActionScrollUp);
-            RegisterCommand($@"press (?:the )?(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
-            RegisterCommand("select all(?: the)?(?: text)?", ActionSelectAll);
-            RegisterCommand("(copy|cut|paste)(?:(?: (?:to|into|from))? (?:the )?clipboard)?", ActionClipboard);
-            RegisterCommand($"delete(?: the)?(?: (?:last|previous))?(?: ({NUMBERS}))? words?", ActionDeleteWord);
-            RegisterCommand("send(?: the)? message", ActionSendMessage, AssistantMode.Messenger);
+            RegisterCommand($@"press {ART}(.+?)(?: key)?(?: ({NUMBERS}) (?:times|\*))?", ActionPressKey);
+            RegisterCommand($"select all(?:{ART} text)?", ActionSelectAll);
+            RegisterCommand($"(copy|cut|paste)(?:(?: (?:to|into|from))? {ART}clipboard)?", ActionClipboard);
+            RegisterCommand($"delete {ART}(?:(?:last|previous) )?(?:({NUMBERS}) )?words?", ActionDeleteWord);
+            RegisterCommand($"send {ART}message", ActionSendMessage, AssistantMode.Messenger);
 
             // Mouse
-            RegisterCommand($"move (?:the )?(?:mouse(?: cursor)?|cursor) ({NUMBERS}) pixels (?:to the )?(left|right|up|down)", ActionMoveCursor);
-            RegisterCommand($@"(?:(?:do|perform) (?:a )?)?(left|right|middle) (?:mouse )?click(?: ({NUMBERS}) (?:times|\*))?", ActionMouseClick);
+            RegisterCommand($"move {ART}(?:mouse(?: cursor)?|cursor) ({NUMBERS}) pixels (?:to {ART})?(left|right|up|down)", ActionMoveCursor);
+            RegisterCommand($@"(?:(?:do|perform) {ART})?(left|right|middle) (?:mouse )?click(?: ({NUMBERS}) (?:times|\*))?", ActionMouseClick);
 
             // Problem solving - offline
             RegisterCommand(@"how much is (-?\d+(?:.\d+)?) (\+|-|\*|/) (-?\d+(?:.\d+)?)", ActionSolveMathProblem);
             RegisterCommand("(?:what is|what's) the time|what time is it", ActionReadTime);
-            RegisterCommand("(?:tell|read) (?:me )?a joke", ActionReadJoke);
+            RegisterCommand($"(?:tell|read) (?:me )?{ART} joke", ActionReadJoke);
 
             // Problem solving - online
-            RegisterCommand("(?:open(?: up)?|show me|display) (?:the )?weather forecast", ActionOpenWeatherForecast);
+            RegisterCommand($"(?:open(?: up)?|show me|display) {ART}weather forecast", ActionOpenWeatherForecast);
             RegisterCommand("how much is (.+)", ActionGoogleMathProblem);
-            RegisterCommand("(?:search(?: for)?|find|show me) (.+?)(?: (?:using|on) (Google|YouTube|Wikipedia))?", ActionSearch);
-            RegisterCommand("play (?:me )?(?:some(?:thing from)? (.+?)|(?:a )?(.+?) (?:YouTube )?mix)(?: on YouTube)?", ActionPlayYouTubeMix);
-            RegisterCommand("play (?:(?:a )?(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
+            RegisterCommand($"(?:search(?: for)?|find|show me) (.+?)(?: (?:using|on) {ART}(Google|YouTube|Wikipedia))?", ActionSearch);
+            RegisterCommand($"play (?:me )?(?:some(?:thing from)? (.+?)|{ART}(.+?) (?:YouTube )?mix)(?: on YouTube)?(?: for me)?", ActionPlayYouTubeMix);
+            RegisterCommand($"play (?:{ART}(?:YouTube )?video called )?(.+?)(?: video)?(?: on YouTube)?", ActionPlayYouTubeVideo);
 
             if (data.FacebookContacts.Length > 0)
             {
                 string listOfAlternatives = string.Join("|", data.FacebookContacts.Select(x => string.Join("|", x.Pattern)));
-                RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:the|a|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
+                RegisterCommand($"open(?: my)?(?: Facebook)? chat with(?: (?:{ART_ONLY}|my))? ({listOfAlternatives})(?: on Facebook)?(?: in Messenger)?", ActionOpenFacebookChat);
             }
 
             // Browser
-            RegisterCommand("open (?:(?:(?:the|a|my) )?(?:web )?browser|(?:a )?(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
-            RegisterCommand("open (Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)", ActionOpenWebpage);
-            RegisterCommand("open (?:a )?new tab", ActionBrowserNewTab, AssistantMode.Browser);
-            RegisterCommand("close (?:(?:the(?: active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
-            RegisterCommand("(?:re)?open (?:the (?:last )?)?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
-            RegisterCommand("switch (?:to (?:the )?next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
-            RegisterCommand("switch to (?:the )?previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
-            RegisterCommand("go (?:back|to (?:the )(?:previous|last) page)", ActionBrowserBack, AssistantMode.Browser);
-            RegisterCommand("go (?:forward|to (?:the )next page)", ActionBrowserForward, AssistantMode.Browser);
+            RegisterCommand($"open (?:(?:(?:{ART_ONLY}|my) )?(?:web )?browser|{ART}(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
+            RegisterCommand($"open {ART}(Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)(?: in {ART}new (?:browser )?(?:tab|window))?", ActionOpenWebpage);
+            RegisterCommand($"open {ART}new tab", ActionBrowserNewTab, AssistantMode.Browser);
+            RegisterCommand($"close (?:(?:{ART}(?:active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
+            RegisterCommand($"(?:re)?open {ART}(?:last )?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
+            RegisterCommand($"switch (?:to )?{ART}(?:next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
+            RegisterCommand($"switch to {ART}previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
+            RegisterCommand($"(?:go|move|switch) (?:back|(?:back )?to {ART}(?:previous|last) page)", ActionBrowserBack, AssistantMode.Browser);
+            RegisterCommand($"(?:go|move|switch) (?:forward|(?:forward )?to {ART}(?:next|following) page)", ActionBrowserForward, AssistantMode.Browser);
 
             // Chess
-            RegisterCommand("(?:make a (?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
+            RegisterCommand($"(?:make {ART}(?:chess )?)?move from ([A-H][1-8]) to ([A-H][1-8])", x =>
             {
                 Speak($"Making a chess move from {x[0]} to {x[1]}");
                 System.IO.File.AppendAllText(AppDomain.CurrentDomain.BaseDirectory + @"..\Chess\log.txt", x[0] + x[1]);
