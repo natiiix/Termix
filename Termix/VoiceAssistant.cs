@@ -114,7 +114,7 @@ namespace Termix
             RegisterCommand($"reset {ART}(?:assistant )?(?:settings|options|configuration)", ActionResetSettings);
 
             // Operating system
-            RegisterCommand($"close (?:(?:{ART}(?:active)?|this) )?window", ActionCloseWindow);
+            RegisterCommand($"close (?:{ART}(?:active )?|this )?window", ActionCloseWindow);
             RegisterCommand($"open (?:(?:my|{ART_ONLY}) )?(documents|music|pictures|videos|downloads|desktop)(?: (?:directory|folder|library))?", ActionOpenUserDirectory);
             RegisterCommand($"open {ART}notepad", ActionOpenNotepad);
             RegisterCommand($"open {ART}calculator", ActionOpenCalc);
@@ -168,7 +168,7 @@ namespace Termix
             RegisterCommand($"open (?:(?:(?:{ART_ONLY}|my) )?(?:web )?browser|{ART}(?:new )?(?:web )?browser window)", ActionOpenWebBrowser);
             RegisterCommand($"open {ART}(Google|YouTube|Wikipedia|Facebook|Twitter|Twitch|Tumblr|Discord|GitHub)(?: in {ART}new (?:browser )?(?:tab|window))?", ActionOpenWebpage);
             RegisterCommand($"open {ART}new tab", ActionBrowserNewTab, AssistantMode.Browser);
-            RegisterCommand($"close (?:(?:{ART}(?:active)?|this) )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
+            RegisterCommand($"close (?:{ART}(?:active )?|this )?tab", ActionBrowserCloseTab, AssistantMode.Browser);
             RegisterCommand($"(?:re)?open {ART}(?:last )?(?:closed )?tab", ActionBrowserReopenTab, AssistantMode.Browser);
             RegisterCommand($"switch (?:to )?{ART}(?:next )?tab", ActionBrowserNextTab, AssistantMode.Browser);
             RegisterCommand($"switch to {ART}previous tab", ActionBrowserPreviousTab, AssistantMode.Browser);
